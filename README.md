@@ -13,7 +13,7 @@ This project also contains SQL reporting server report "SCOM_ServersOnMaintenanc
 
 ## SCOM database delegations
 You can use this these commands to create "SCOMagentMaintenanceToolUser" role to SCOM database and after that you just need give that role for group where all server admins are:
-CREATE ROLE SCOMagentMaintenanceToolUser
-GRANT EXECUTE ON p_MaintenanceModeStart TO SCOMagentMaintenanceToolUser
-GRANT EXECUTE ON p_MaintenanceModeStop TO SCOMagentMaintenanceToolUser
-GRANT EXECUTE ON p_MaintenanceModeUpdate TO SCOMagentMaintenanceToolUser
+* CREATE ROLE SCOMagentMaintenanceToolUser
+* GRANT EXECUTE ON p_MaintenanceModeStart TO SCOMagentMaintenanceToolUser
+* GRANT EXECUTE ON p_MaintenanceModeStop TO SCOMagentMaintenanceToolUser
+* GRANT EXECUTE ON p_MaintenanceModeUpdate TO SCOMagentMaintenanceToolUser
