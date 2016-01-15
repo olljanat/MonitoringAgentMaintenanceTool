@@ -17,3 +17,14 @@ You can use this these commands to create "SCOMagentMaintenanceToolUser" role to
 * GRANT EXECUTE ON p_MaintenanceModeStart TO SCOMagentMaintenanceToolUser
 * GRANT EXECUTE ON p_MaintenanceModeStop TO SCOMagentMaintenanceToolUser
 * GRANT EXECUTE ON p_MaintenanceModeUpdate TO SCOMagentMaintenanceToolUser
+
+## Screenshots
+### Debug mode
+![Alt text](https://github.com/olljanat/SCOMagentMaintenanceTool/Screenshots/DebugMode.PNG "Debug mode")
+### Normal mode
+![Alt text](https://github.com/olljanat/SCOMagentMaintenanceTool/Screenshots/NormalMode_after_start.PNG "Normal mode after start")
+![Alt text](https://github.com/olljanat/SCOMagentMaintenanceTool/Screenshots/NormalMode_maintenance_enabled.PNG "Normal mode maintenance enabled")
+![Alt text](https://github.com/olljanat/SCOMagentMaintenanceTool/Screenshots/NormalMode_maintenance_updated.PNG "Normal mode maintenance updated")
+![Alt text](https://github.com/olljanat/SCOMagentMaintenanceTool/Screenshots/NormalMode_maintenance_disabled.PNG "Normal mode maintenance disabled")
+### SQL report
+![Alt text](https://github.com/olljanat/SCOMagentMaintenanceTool/Screenshots/SQLreport.PNG "SQL report")
