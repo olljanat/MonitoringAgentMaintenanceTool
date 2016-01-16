@@ -15,7 +15,11 @@ namespace SCOMagentMaintenanceTool
         public string strRestartInfoText = "Restart button will be activated after you enable maintenance mode";
         public string strRegistryKey = "SCOMagentMaintenanceTool";
         public string strMaintenanceStatusValue = "MaintenanceStatus";
-        public string strMaintenanceUntilValue = "strMaintenanceUntil";
+        public string strMaintenanceUntilValue = "MaintenanceUntil";
+        public string strPlannedMaintenanceValue = "PlannedMaintenance";
+        public string strMaintenanceReasonValue = "MaintenananceReason";
+        public string strMaintenanceCommentValue = "MaintenananceComment";
+        public string strMaintenanceEnabledByValue = "MaintenanceEnabledBy";
         public string userName = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
 
         public Form1()
@@ -71,6 +75,7 @@ namespace SCOMagentMaintenanceTool
         {
             this.Left = Screen.PrimaryScreen.Bounds.Width - this.Width;
             this.Top = Screen.PrimaryScreen.Bounds.Height - this.Height;
+            lbl_SCOMconnectInfo.Text = "";
 
             // DEBUG mode
             if (Settings.DebugMode == true)
@@ -82,9 +87,6 @@ namespace SCOMagentMaintenanceTool
                 this.ClientSize = new System.Drawing.Size(288, 430);
                 this.groupBox_DEBUG.Visible = false;
             }
-
-            // Update maintenance status
-            UpdateMaintenanceStatus(2,"");
 
             // Fill duration combobox
             Dictionary<int, string> comboSourceDuration = new Dictionary<int, string>();
@@ -105,7 +107,8 @@ namespace SCOMagentMaintenanceTool
             // Fill reason combobox
             updateReasonCombobox();
 
-            lbl_SCOMconnectInfo.Text = "";
+            // Update maintenance status
+            GetMaintenanceStatus();
         }
 
         public void updateReasonCombobox()
@@ -141,7 +144,7 @@ namespace SCOMagentMaintenanceTool
             this.cbx_Reason.SelectedIndex = 0;
         }
 
-        public void UpdateMaintenanceStatus(int Status, string strMaintenanceUntil)
+        public void GetMaintenanceStatus()
         {
             RegistryKey RegistryKey = Registry.LocalMachine.OpenSubKey("SOFTWARE", true);
 
@@ -149,33 +152,40 @@ namespace SCOMagentMaintenanceTool
                 RegistryKey.CreateSubKey(strRegistryKey);
             RegistryKey = RegistryKey.OpenSubKey(strRegistryKey, true);
 
-            // Status = 2 means that we will just read current value instead of updating it
-            if (Status == 2) {
-                if (RegistryKey.GetValue(strMaintenanceStatusValue) == null)
-                    RegistryKey.SetValue(strMaintenanceStatusValue, 0);
-                if (RegistryKey.GetValue(strMaintenanceUntilValue) == null)
-                    RegistryKey.SetValue(strMaintenanceUntilValue, "");
+            if (RegistryKey.GetValue(strMaintenanceStatusValue) == null)
+                RegistryKey.SetValue(strMaintenanceStatusValue, 0);
+            if (RegistryKey.GetValue(strMaintenanceUntilValue) == null)
+                RegistryKey.SetValue(strMaintenanceUntilValue, "");
+            if (RegistryKey.GetValue(strPlannedMaintenanceValue) == null)
+                RegistryKey.SetValue(strPlannedMaintenanceValue, 0);
+            if (RegistryKey.GetValue(strMaintenanceReasonValue) == null)
+                RegistryKey.SetValue(strMaintenanceReasonValue, 0);
+            if (RegistryKey.GetValue(strMaintenanceCommentValue) == null)
+                RegistryKey.SetValue(strMaintenanceCommentValue, "");
+            if (RegistryKey.GetValue(strMaintenanceEnabledByValue) == null)
+                RegistryKey.SetValue(strMaintenanceEnabledByValue, "");
 
-                // If maintenance until value is already in past
-                strMaintenanceUntil = RegistryKey.GetValue(strMaintenanceUntilValue).ToString();
-                if (strMaintenanceUntil != "") {
-                    DateTime currentTime = DateTime.Now;
-                    DateTime MaintenanceUntil = DateTime.Parse(strMaintenanceUntil);
-                    if (currentTime >= MaintenanceUntil)
-                    {
-                        RegistryKey.SetValue(strMaintenanceStatusValue, 0);
-                        RegistryKey.SetValue(strMaintenanceUntilValue, "");
-                    }
-                }
-            }
-            else
-            {
-                RegistryKey.SetValue(strMaintenanceStatusValue, Status);
-            }
-
-
+            // If maintenance until value is already in past
             object boolMaintenanceStatus = RegistryKey.GetValue(strMaintenanceStatusValue);
-            if ((int)boolMaintenanceStatus == 1)
+            string strMaintenanceUntil = RegistryKey.GetValue(strMaintenanceUntilValue).ToString();
+            int intPlannedMaintenanceSelection = (int) RegistryKey.GetValue(strPlannedMaintenanceValue);
+            int intPlannedMaintenanceReason = (int) RegistryKey.GetValue(strMaintenanceReasonValue);
+            string strMaintenanceComment = RegistryKey.GetValue(strMaintenanceCommentValue).ToString();
+            string strMaintenanceEnabledBy = RegistryKey.GetValue(strMaintenanceEnabledByValue).ToString();
+            DateTime currentTime = DateTime.Now;
+            DateTime MaintenanceUntil = currentTime;
+
+            if (strMaintenanceUntil != "")
+                MaintenanceUntil = DateTime.Parse(strMaintenanceUntil);
+
+            if (((int)boolMaintenanceStatus == 1) && (strMaintenanceUntil != "") && (currentTime >= MaintenanceUntil))
+            {
+                RegistryKey.SetValue(strMaintenanceStatusValue, 0);
+                RegistryKey.SetValue(strMaintenanceUntilValue, "");
+                RegistryKey.SetValue(strMaintenanceReasonValue, null);
+                RegistryKey.SetValue(strMaintenanceCommentValue, "");
+            }
+            else if ((int)boolMaintenanceStatus == 1)
             {
                 this.label_MaintenanceStatus.Text = "Enabled";
                 this.btn_Restart.Enabled = true;
@@ -183,23 +193,21 @@ namespace SCOMagentMaintenanceTool
                 this.label_until.Text = "until:";
                 this.btn_Disable.Enabled = true;
                 this.checkBox_PlannedMaintenance.Enabled = false;
+                this.label_until_value.Text = strMaintenanceUntil;
+                if (intPlannedMaintenanceSelection == 1)
+                    this.checkBox_PlannedMaintenance.CheckState = CheckState.Checked;
+                else
+                    this.checkBox_PlannedMaintenance.CheckState = CheckState.Unchecked;
+                this.cbx_Reason.SelectedIndex = intPlannedMaintenanceReason;
+                this.txt_Comment.Text = strMaintenanceComment;
+                this.lbl_SCOMconnectInfo.Text = "Maintenance mode enabled by: " + strMaintenanceEnabledBy;
 
                 // Modify "Enable" button to "Update" button
                 this.btn_Enable.Text = "Update";
                 this.cbx_Reason.Enabled = false;
                 this.txt_Comment.Enabled = false;
-
                 this.btn_Enable.Click -= new System.EventHandler(this.btn_Enable_Click);
                 this.btn_Enable.Click += new System.EventHandler(this.btn_Update_Click);
-
-                if (strMaintenanceUntil != "")
-                    RegistryKey.SetValue(strMaintenanceUntilValue, strMaintenanceUntil);
-
-                if (RegistryKey.GetValue(strMaintenanceUntilValue) == null)
-                    RegistryKey.SetValue(strMaintenanceUntilValue, "");
-
-                strMaintenanceUntil = RegistryKey.GetValue(strMaintenanceUntilValue).ToString();
-                this.label_until_value.Text = strMaintenanceUntil;
             }
             else
             {
@@ -217,9 +225,32 @@ namespace SCOMagentMaintenanceTool
                 this.txt_Comment.Enabled = true;
                 this.btn_Enable.Click -= new System.EventHandler(this.btn_Update_Click);
                 this.btn_Enable.Click += new System.EventHandler(this.btn_Enable_Click);
-
-                RegistryKey.SetValue(strMaintenanceUntilValue, "");
             }
+        }
+
+        public void UpdateMaintenanceStatus(int Status, string strMaintenanceUntil)
+        {
+            RegistryKey RegistryKey = Registry.LocalMachine.OpenSubKey("SOFTWARE", true);
+
+            if (RegistryKey.OpenSubKey(strRegistryKey) == null)
+                RegistryKey.CreateSubKey(strRegistryKey);
+            RegistryKey = RegistryKey.OpenSubKey(strRegistryKey, true);
+
+            RegistryKey.SetValue(strMaintenanceStatusValue, Status);
+
+            if (Status == 1)
+            {
+                RegistryKey.SetValue(strMaintenanceUntilValue, strMaintenanceUntil);
+                if (((CheckBox)this.checkBox_PlannedMaintenance).CheckState == CheckState.Checked)
+                    RegistryKey.SetValue(strPlannedMaintenanceValue, 1);
+                else
+                    RegistryKey.SetValue(strPlannedMaintenanceValue, 0);
+                RegistryKey.SetValue(strMaintenanceReasonValue, (this.cbx_Reason.SelectedIndex));
+                RegistryKey.SetValue(strMaintenanceCommentValue, this.txt_Comment.Text);
+                RegistryKey.SetValue(strMaintenanceEnabledByValue, userName);
+            }
+
+            GetMaintenanceStatus();
         }
 
         public void EnableMaintenanceMode(int DurationMin)
