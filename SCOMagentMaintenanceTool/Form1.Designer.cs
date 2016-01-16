@@ -168,9 +168,9 @@
             this.label2.AutoSize = true;
             this.label2.Location = new System.Drawing.Point(6, 25);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(72, 13);
+            this.label2.Size = new System.Drawing.Size(47, 13);
             this.label2.TabIndex = 0;
-            this.label2.Text = "Duration (min)";
+            this.label2.Text = "Duration";
             // 
             // btn_Restart
             // 

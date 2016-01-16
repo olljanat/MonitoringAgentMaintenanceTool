@@ -46,12 +46,12 @@ namespace SCOMagentMaintenanceTool
 
         private void btn_Enable_Click(object sender, EventArgs e)
         {
-            EnableMaintenanceMode(Int32.Parse(this.cbx_Duration.SelectedItem.ToString()));
+            EnableMaintenanceMode(((KeyValuePair<int, string>)this.cbx_Duration.SelectedItem).Key);
         }
 
         private void btn_Update_Click(object sender, EventArgs e)
         {
-            UpdateMaintenanceMode(Int32.Parse(this.cbx_Duration.SelectedItem.ToString()));
+            UpdateMaintenanceMode(((KeyValuePair<int, string>)this.cbx_Duration.SelectedItem).Key);
         }
 
         private void btn_Disable_Click(object sender, EventArgs e)
@@ -87,28 +87,38 @@ namespace SCOMagentMaintenanceTool
             // Update maintenance status
             UpdateMaintenanceStatus(2,"");
 
-            this.cbx_Duration.Items.Add("30");
-            this.cbx_Duration.Items.Add("60");
-            this.cbx_Duration.Items.Add("120");
-            this.cbx_Duration.Items.Add("180");
-            this.cbx_Duration.Items.Add("240");
+            // Fill duration combobox
+            Dictionary<int, string> comboSourceDuration = new Dictionary<int, string>();
+            comboSourceDuration.Add(30, "30 minutes");
+            comboSourceDuration.Add(60, "1 hour");
+            comboSourceDuration.Add(120, "2 hours");
+            comboSourceDuration.Add(180, "3 hours");
+            comboSourceDuration.Add(240, "4 hours");
+            comboSourceDuration.Add(300, "5 hours");
+            comboSourceDuration.Add(360, "6 hours");
+            comboSourceDuration.Add(420, "7 hours");
+            comboSourceDuration.Add(480, "8 hours");
+            this.cbx_Duration.DataSource = new BindingSource(comboSourceDuration, null);
+            this.cbx_Duration.DisplayMember = "Value";
+            this.cbx_Duration.ValueMember = "Key";
             this.cbx_Duration.SelectedIndex = 0;
 
-            this.cbx_Reason.Items.Add("PlannedOther");
-            this.cbx_Reason.Items.Add("UnplannedOther");
-            this.cbx_Reason.Items.Add("PlannedHardwareMaintenance");
-            this.cbx_Reason.Items.Add("UnplannedHardwareMaintenance");
-            this.cbx_Reason.Items.Add("PlannedHardwareInstallation");
-            this.cbx_Reason.Items.Add("UnplannedHardwareInstallation");
-            this.cbx_Reason.Items.Add("PlannedOperatingSystemReconfiguration");
-            this.cbx_Reason.Items.Add("UnplannedOperatingSystemReconfiguration");
-            this.cbx_Reason.Items.Add("PlannedApplicationMaintenance");
-            this.cbx_Reason.Items.Add("UnplannedApplicationMaintenance");
-            this.cbx_Reason.Items.Add("ApplicationInstallation");
-            this.cbx_Reason.Items.Add("ApplicationUnresponsive");
-            this.cbx_Reason.Items.Add("ApplicationUnstable");
-            this.cbx_Reason.Items.Add("SecurityIssue");
-            this.cbx_Reason.Items.Add("LossOfNetworkConnectivity");
+            // Fill Reason combobox
+            this.cbx_Reason.Items.Add("Other (Planned)"); // 0
+            this.cbx_Reason.Items.Add("Other (Unplanned)"); // 1
+            this.cbx_Reason.Items.Add("Hardware: Maintenance (Planned)"); // 2
+            this.cbx_Reason.Items.Add("Hardware: Maintenance (Unplanned)"); // 3
+            this.cbx_Reason.Items.Add("Hardware: Installation (Planned)"); // 4
+            this.cbx_Reason.Items.Add("Hardware: Installation (Unplanned)"); // 5
+            this.cbx_Reason.Items.Add("Operating System: Reconfiguration (Planned)"); // 6
+            this.cbx_Reason.Items.Add("Operating System: Reconfiguration (Unplanned)"); // 7
+            this.cbx_Reason.Items.Add("Application: Maintenance (Planned)"); // 8
+            this.cbx_Reason.Items.Add("Application: Maintenance (Unplanned)"); // 9
+            this.cbx_Reason.Items.Add("Application: Installation (Planned)"); // 10
+            this.cbx_Reason.Items.Add("Application: Unresponsive"); // 11
+            this.cbx_Reason.Items.Add("Application: Unstable"); // 12
+            this.cbx_Reason.Items.Add("Security Issue"); // 13
+            this.cbx_Reason.Items.Add("Loss of network connectivity (Unplanned)"); // 14
             this.cbx_Reason.SelectedIndex = 0;
 
             lbl_SCOMconnectInfo.Text = "";
@@ -365,6 +375,13 @@ EXEC p_MaintenanceModeStop
                 }
             }
             return true;
+        }
+
+        public void RestartServer()
+        {
+            string strCmdText;
+            strCmdText = "/r /t 0 /c " + this.txt_Comment + " /d ";
+            System.Diagnostics.Process.Start("C:\\Windows\\System32\\shutdown.exe", strCmdText);
         }
     }
 }

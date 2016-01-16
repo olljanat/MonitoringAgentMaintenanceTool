@@ -15,6 +15,6 @@ namespace SCOMagentMaintenanceTool
         public static bool DebugMode = true;
 
         // Test UI without connecting to SCOM
-        public static bool DemoMode = true;
+        public static bool DemoMode = false;
     }
 }
