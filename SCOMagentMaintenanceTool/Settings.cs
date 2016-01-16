@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace SCOMagentMaintenanceTool
 {
-    public partial class Form1
+    public static class Settings
     {
-        public string SCOMdbConnectionString = "Data Source=SqlServer;Initial Catalog=OperationsManager;Integrated Security=True;";
-        public bool DebugMode = true;
+        public static string SCOMdbConnectionString = "Data Source=SqlServer;Initial Catalog=OperationsManager;Integrated Security=True;";
+        public static bool DebugMode = true;
     }
 }

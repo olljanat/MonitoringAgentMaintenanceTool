@@ -70,7 +70,7 @@ namespace SCOMagentMaintenanceTool
             this.Top = Screen.PrimaryScreen.Bounds.Height - this.Height;
 
             // DEBUG mode
-            if (DebugMode == true)
+            if (Settings.DebugMode == true)
             {
                 this.ClientSize = new System.Drawing.Size(1024, 768);
             }
@@ -215,11 +215,11 @@ EXEC p_MaintenanceModeStart
 
 ";
 
-            if (DebugMode == true)
+            if (Settings.DebugMode == true)
                 this.txt_DEBUG.Text = "Executing SQL query:" + strSQLquery;
 
 
-            bool returnCode = ExecuteSQLquery(strSQLquery, SCOMdbConnectionString);
+            bool returnCode = ExecuteSQLquery(strSQLquery, Settings.SCOMdbConnectionString);
 
             if (returnCode == true) {
                 this.lbl_SCOMconnectInfo.Text = "Maintenance mode enabled";
@@ -253,11 +253,11 @@ EXEC p_MaintenanceModeUpdate
 
 ";
 
-            if (DebugMode == true)
+            if (Settings.DebugMode == true)
                 this.txt_DEBUG.Text = "Executing SQL query:" + strSQLquery;
 
 
-            bool returnCode = ExecuteSQLquery(strSQLquery, SCOMdbConnectionString);
+            bool returnCode = ExecuteSQLquery(strSQLquery, Settings.SCOMdbConnectionString);
 
             if (returnCode == true)
             {
@@ -287,11 +287,11 @@ EXEC p_MaintenanceModeStop
 
 ";
 
-            if (DebugMode == true)
+            if (Settings.DebugMode == true)
                 this.txt_DEBUG.Text = "Executing SQL query:" + strSQLquery;
 
 
-            bool returnCode = ExecuteSQLquery(strSQLquery, SCOMdbConnectionString);
+            bool returnCode = ExecuteSQLquery(strSQLquery, Settings.SCOMdbConnectionString);
 
             if (returnCode == true)
             {
@@ -329,7 +329,7 @@ EXEC p_MaintenanceModeStop
                     lbl_SCOMconnectInfo.Text += "Connection to SCOM database failed. Check you connection string.";
                     lbl_SCOMconnectInfo.ForeColor = System.Drawing.Color.Red;
 
-                    if (DebugMode == true)
+                    if (Settings.DebugMode == true)
                         txt_DEBUG.Text += "ERROR: " + e.Message;
 
                     return false;
@@ -345,7 +345,7 @@ EXEC p_MaintenanceModeStop
                     lbl_SCOMconnectInfo.Text += "Executing SQL query failed. You probably don't have enough rights to SCOM database.";
                     lbl_SCOMconnectInfo.ForeColor = System.Drawing.Color.Red;
 
-                    if (DebugMode == true)
+                    if (Settings.DebugMode == true)
                         txt_DEBUG.Text += "ERROR: " + e.Message;
 
                     return false;
