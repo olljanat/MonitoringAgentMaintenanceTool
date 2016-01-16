@@ -1,19 +1,19 @@
 ﻿using System;
+using System.Configuration;
 using System.Collections.Generic;
-using System.Windows.Forms;
-using Microsoft.Win32;
+using System.Data.SqlClient;
+using System.Globalization;
 using System.Net;
 using System.Net.NetworkInformation;
-using System.Globalization;
-using System.Data.SqlClient;
+using System.Reflection;
+using System.Windows.Forms;
 
 namespace SCOMagentMaintenanceTool
 {
     public partial class Form1 : Form
     {
-        // General strings
+        // General strings/settings
         public string strRestartInfoText = "Restart button will be activated after you enable maintenance mode";
-        public string strRegistryKey = "SCOMagentMaintenanceTool";
         public string strMaintenanceStatusValue = "MaintenanceStatus";
         public string strMaintenanceUntilValue = "MaintenanceUntil";
         public string strPlannedMaintenanceValue = "PlannedMaintenance";
@@ -21,6 +21,12 @@ namespace SCOMagentMaintenanceTool
         public string strMaintenanceCommentValue = "MaintenananceComment";
         public string strMaintenanceEnabledByValue = "MaintenanceEnabledBy";
         public string userName = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
+        public string SCOMdbConnectionString;
+        public bool DebugMode = false;
+        public bool DemoMode = false;
+        public string TempConfigFile = System.Environment.GetEnvironmentVariable("public") + "\\SCOMagentMaintenanceTool.config";
+        public ExeConfigurationFileMap TempConfigMap = new ExeConfigurationFileMap();
+        public Configuration TempConfig;
 
         public Form1()
         {
@@ -73,12 +79,21 @@ namespace SCOMagentMaintenanceTool
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            this.Left = Screen.PrimaryScreen.Bounds.Width - this.Width;
-            this.Top = Screen.PrimaryScreen.Bounds.Height - this.Height;
+            // Read settings
+            SCOMdbConnectionString = ConfigurationManager.AppSettings["SCOMdbConnectionString"];
+            DebugMode = Convert.ToBoolean(ConfigurationManager.AppSettings["DebugMode"]);
+            DemoMode = Convert.ToBoolean(ConfigurationManager.AppSettings["DemoMode"]);
+
+            // Load temporary settings
+            TempConfigMap.ExeConfigFilename = TempConfigFile;
+            TempConfig = ConfigurationManager.OpenMappedExeConfiguration(TempConfigMap, ConfigurationUserLevel.None);
+
+            // this.Left = Screen.PrimaryScreen.Bounds.Width - this.Width;
+            // this.Top = Screen.PrimaryScreen.Bounds.Height - this.Height;
             lbl_SCOMconnectInfo.Text = "";
 
             // DEBUG mode
-            if (Settings.DebugMode == true)
+            if (ConfigurationManager.AppSettings["DebugMode"] == "true")
             {
                 this.ClientSize = new System.Drawing.Size(1024, 768);
             }
@@ -146,46 +161,37 @@ namespace SCOMagentMaintenanceTool
 
         public void GetMaintenanceStatus()
         {
-            RegistryKey RegistryKey = Registry.LocalMachine.OpenSubKey("SOFTWARE", true);
+            if (!(System.IO.File.Exists(TempConfigFile)))
+            {
+                System.Windows.Forms.MessageBox.Show("Temporary configuration file: " + TempConfigFile + " missing");
+                System.Environment.Exit(1);
+            }
 
-            if (RegistryKey.OpenSubKey(strRegistryKey) == null)
-                RegistryKey.CreateSubKey(strRegistryKey);
-            RegistryKey = RegistryKey.OpenSubKey(strRegistryKey, true);
+            bool boolMaintenanceStatus = Convert.ToBoolean(TempConfig.AppSettings.Settings["MaintenanceStatus"].Value);
+            string strMaintenanceUntil = TempConfig.AppSettings.Settings["MaintenanceUntil"].Value;
+            int intPlannedMaintenanceSelection, intPlannedMaintenanceReason;
+            int.TryParse(TempConfig.AppSettings.Settings["PlannedMaintenance"].Value, out intPlannedMaintenanceSelection);
+            int.TryParse(TempConfig.AppSettings.Settings["MaintenananceReason"].Value, out intPlannedMaintenanceReason);
+            string strMaintenanceComment = TempConfig.AppSettings.Settings["MaintenananceComment"].Value;
+            string strMaintenanceEnabledBy = TempConfig.AppSettings.Settings["MaintenanceEnabledBy"].Value;
 
-            if (RegistryKey.GetValue(strMaintenanceStatusValue) == null)
-                RegistryKey.SetValue(strMaintenanceStatusValue, 0);
-            if (RegistryKey.GetValue(strMaintenanceUntilValue) == null)
-                RegistryKey.SetValue(strMaintenanceUntilValue, "");
-            if (RegistryKey.GetValue(strPlannedMaintenanceValue) == null)
-                RegistryKey.SetValue(strPlannedMaintenanceValue, 0);
-            if (RegistryKey.GetValue(strMaintenanceReasonValue) == null)
-                RegistryKey.SetValue(strMaintenanceReasonValue, 0);
-            if (RegistryKey.GetValue(strMaintenanceCommentValue) == null)
-                RegistryKey.SetValue(strMaintenanceCommentValue, "");
-            if (RegistryKey.GetValue(strMaintenanceEnabledByValue) == null)
-                RegistryKey.SetValue(strMaintenanceEnabledByValue, "");
-
-            // If maintenance until value is already in past
-            object boolMaintenanceStatus = RegistryKey.GetValue(strMaintenanceStatusValue);
-            string strMaintenanceUntil = RegistryKey.GetValue(strMaintenanceUntilValue).ToString();
-            int intPlannedMaintenanceSelection = (int) RegistryKey.GetValue(strPlannedMaintenanceValue);
-            int intPlannedMaintenanceReason = (int) RegistryKey.GetValue(strMaintenanceReasonValue);
-            string strMaintenanceComment = RegistryKey.GetValue(strMaintenanceCommentValue).ToString();
-            string strMaintenanceEnabledBy = RegistryKey.GetValue(strMaintenanceEnabledByValue).ToString();
             DateTime currentTime = DateTime.Now;
             DateTime MaintenanceUntil = currentTime;
-
             if (strMaintenanceUntil != "")
                 MaintenanceUntil = DateTime.Parse(strMaintenanceUntil);
 
-            if (((int)boolMaintenanceStatus == 1) && (strMaintenanceUntil != "") && (currentTime >= MaintenanceUntil))
+            // If maintenance mode is already ended
+            if ((boolMaintenanceStatus == true) && (strMaintenanceUntil != "") && (currentTime >= MaintenanceUntil))
             {
-                RegistryKey.SetValue(strMaintenanceStatusValue, 0);
-                RegistryKey.SetValue(strMaintenanceUntilValue, "");
-                RegistryKey.SetValue(strMaintenanceReasonValue, null);
-                RegistryKey.SetValue(strMaintenanceCommentValue, "");
+                TempConfig.AppSettings.Settings["MaintenanceStatus"].Value = "false";
+                TempConfig.AppSettings.Settings["MaintenanceUntil"].Value = "";
+                TempConfig.AppSettings.Settings["PlannedMaintenance"].Value = "0";
+                TempConfig.AppSettings.Settings["MaintenananceReason"].Value = "";
+                TempConfig.AppSettings.Settings["MaintenananceComment"].Value = "";
+                TempConfig.AppSettings.Settings["MaintenanceEnabledBy"].Value = "";
+                TempConfig.Save(ConfigurationSaveMode.Modified);
             }
-            else if ((int)boolMaintenanceStatus == 1)
+            else if (boolMaintenanceStatus == true)
             {
                 this.label_MaintenanceStatus.Text = "Enabled";
                 this.btn_Restart.Enabled = true;
@@ -230,24 +236,29 @@ namespace SCOMagentMaintenanceTool
 
         public void UpdateMaintenanceStatus(int Status, string strMaintenanceUntil)
         {
-            RegistryKey RegistryKey = Registry.LocalMachine.OpenSubKey("SOFTWARE", true);
-
-            if (RegistryKey.OpenSubKey(strRegistryKey) == null)
-                RegistryKey.CreateSubKey(strRegistryKey);
-            RegistryKey = RegistryKey.OpenSubKey(strRegistryKey, true);
-
-            RegistryKey.SetValue(strMaintenanceStatusValue, Status);
-
             if (Status == 1)
             {
-                RegistryKey.SetValue(strMaintenanceUntilValue, strMaintenanceUntil);
+                // new code
+                TempConfig.AppSettings.Settings["MaintenanceStatus"].Value = "true";
+                TempConfig.AppSettings.Settings["MaintenanceUntil"].Value = strMaintenanceUntil;
                 if (((CheckBox)this.checkBox_PlannedMaintenance).CheckState == CheckState.Checked)
-                    RegistryKey.SetValue(strPlannedMaintenanceValue, 1);
+                    TempConfig.AppSettings.Settings["PlannedMaintenance"].Value = "1";
                 else
-                    RegistryKey.SetValue(strPlannedMaintenanceValue, 0);
-                RegistryKey.SetValue(strMaintenanceReasonValue, (this.cbx_Reason.SelectedIndex));
-                RegistryKey.SetValue(strMaintenanceCommentValue, this.txt_Comment.Text);
-                RegistryKey.SetValue(strMaintenanceEnabledByValue, userName);
+                    TempConfig.AppSettings.Settings["PlannedMaintenance"].Value = "0";
+                TempConfig.AppSettings.Settings["MaintenananceReason"].Value = this.cbx_Reason.SelectedIndex.ToString();
+                TempConfig.AppSettings.Settings["MaintenananceComment"].Value = this.txt_Comment.Text;
+                TempConfig.AppSettings.Settings["MaintenanceEnabledBy"].Value = userName;
+                TempConfig.Save(ConfigurationSaveMode.Modified);
+            }
+            else
+            {
+                TempConfig.AppSettings.Settings["MaintenanceStatus"].Value = "false";
+                TempConfig.AppSettings.Settings["MaintenanceUntil"].Value = "";
+                TempConfig.AppSettings.Settings["PlannedMaintenance"].Value = "0";
+                TempConfig.AppSettings.Settings["MaintenananceReason"].Value = "";
+                TempConfig.AppSettings.Settings["MaintenananceComment"].Value = "";
+                TempConfig.AppSettings.Settings["MaintenanceEnabledBy"].Value = "";
+                TempConfig.Save(ConfigurationSaveMode.Modified);
             }
 
             GetMaintenanceStatus();
@@ -281,12 +292,12 @@ EXEC p_MaintenanceModeStart
 
 ";
 
-            if (Settings.DebugMode == true)
+            if (DebugMode == true)
                 this.txt_DEBUG.Text = "Executing SQL query:" + strSQLquery;
 
             bool returnCode;
-            if (Settings.DebugMode == false)
-                returnCode = ExecuteSQLquery(strSQLquery, Settings.SCOMdbConnectionString);
+            if (DemoMode == false)
+                returnCode = ExecuteSQLquery(strSQLquery, SCOMdbConnectionString);
             else
                 returnCode = true;
 
@@ -323,12 +334,12 @@ EXEC p_MaintenanceModeUpdate
 
 ";
 
-            if (Settings.DebugMode == true)
+            if (DebugMode == true)
                 this.txt_DEBUG.Text = "Executing SQL query:" + strSQLquery;
 
             bool returnCode;
-            if (Settings.DebugMode == false)
-                returnCode = ExecuteSQLquery(strSQLquery, Settings.SCOMdbConnectionString);
+            if (DemoMode == false)
+                returnCode = ExecuteSQLquery(strSQLquery, SCOMdbConnectionString);
             else
                 returnCode = true;
 
@@ -360,12 +371,12 @@ EXEC p_MaintenanceModeStop
 
 ";
 
-            if (Settings.DebugMode == true)
+            if (DebugMode == true)
                 this.txt_DEBUG.Text = "Executing SQL query:" + strSQLquery;
 
             bool returnCode;
-            if (Settings.DebugMode == false)
-                returnCode = ExecuteSQLquery(strSQLquery, Settings.SCOMdbConnectionString);
+            if (DemoMode == false)
+                returnCode = ExecuteSQLquery(strSQLquery, SCOMdbConnectionString);
             else
                 returnCode = true;
 
@@ -405,7 +416,7 @@ EXEC p_MaintenanceModeStop
                     lbl_SCOMconnectInfo.Text += "Connection to SCOM database failed. Check you connection string.";
                     lbl_SCOMconnectInfo.ForeColor = System.Drawing.Color.Red;
 
-                    if (Settings.DebugMode == true)
+                    if (DebugMode == true)
                         txt_DEBUG.Text += "ERROR: " + e.Message;
 
                     return false;
@@ -421,7 +432,7 @@ EXEC p_MaintenanceModeStop
                     lbl_SCOMconnectInfo.Text += "Executing SQL query failed. You probably don't have enough rights to SCOM database.";
                     lbl_SCOMconnectInfo.ForeColor = System.Drawing.Color.Red;
 
-                    if (Settings.DebugMode == true)
+                    if (DebugMode == true)
                         txt_DEBUG.Text += "ERROR: " + e.Message;
 
                     return false;
@@ -488,10 +499,10 @@ EXEC p_MaintenanceModeStop
             string strCmdText;
             strCmdText = "/r /t 0 /c \"" + this.txt_Comment.Text + "\" /d "+ strShutdownReason;
 
-            if (Settings.DebugMode == true)
+            if (DebugMode == true)
                 this.txt_DEBUG.Text = strCmdText;
 
-            if (Settings.DemoMode == false)
+            if (DemoMode == false)
                 System.Diagnostics.Process.Start("C:\\Windows\\System32\\shutdown.exe", strCmdText);
         }
     }

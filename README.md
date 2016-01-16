@@ -7,8 +7,8 @@ This project also contains SQL reporting server report "SCOM_ServersOnMaintenanc
 
 
 ## Configuring / build
-* Configure SCOM database connection string to "SCOMdbConnectionString" variable on Settings.cs
-* Build using Visual Studio 2015 (Express for Windows Desktop is enought)
+* Configure SCOM database connection string to "SCOMdbConnectionString" variable on SCOMagentMaintenanceTool.exe.config
+* Build using Visual Studio 2015 (Express for Windows Desktop is enough)
 * Disable DebugMode after you are tested that application works on your environment and deploy it to all servers.
 
 ## SCOM database delegations
