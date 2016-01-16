@@ -68,6 +68,11 @@ namespace SCOMagentMaintenanceTool
             }
         }
 
+        private void checkBox_PlannedMaintenance_CheckedChanged(object sender, EventArgs e)
+        {
+            updateReasonCombobox();
+        }
+
         private void Form1_Load(object sender, EventArgs e)
         {
             this.Left = Screen.PrimaryScreen.Bounds.Width - this.Width;
@@ -103,27 +108,43 @@ namespace SCOMagentMaintenanceTool
             this.cbx_Duration.ValueMember = "Key";
             this.cbx_Duration.SelectedIndex = 0;
 
-            // Fill Reason combobox
-            this.cbx_Reason.Items.Add("Other (Planned)"); // 0
-            this.cbx_Reason.Items.Add("Other (Unplanned)"); // 1
-            this.cbx_Reason.Items.Add("Hardware: Maintenance (Planned)"); // 2
-            this.cbx_Reason.Items.Add("Hardware: Maintenance (Unplanned)"); // 3
-            this.cbx_Reason.Items.Add("Hardware: Installation (Planned)"); // 4
-            this.cbx_Reason.Items.Add("Hardware: Installation (Unplanned)"); // 5
-            this.cbx_Reason.Items.Add("Operating System: Reconfiguration (Planned)"); // 6
-            this.cbx_Reason.Items.Add("Operating System: Reconfiguration (Unplanned)"); // 7
-            this.cbx_Reason.Items.Add("Application: Maintenance (Planned)"); // 8
-            this.cbx_Reason.Items.Add("Application: Maintenance (Unplanned)"); // 9
-            this.cbx_Reason.Items.Add("Application: Installation (Planned)"); // 10
-            this.cbx_Reason.Items.Add("Application: Unresponsive"); // 11
-            this.cbx_Reason.Items.Add("Application: Unstable"); // 12
-            this.cbx_Reason.Items.Add("Security Issue"); // 13
-
-            // Disabled because it is not possible to use this tool without network connectivity
-            // this.cbx_Reason.Items.Add("Loss of network connectivity (Unplanned)"); // 14
-            this.cbx_Reason.SelectedIndex = 0;
+            // Fill reason combobox
+            updateReasonCombobox();
 
             lbl_SCOMconnectInfo.Text = "";
+        }
+
+        public void updateReasonCombobox()
+        {
+            Dictionary<int, string> comboSourceReason = new Dictionary<int, string>();
+            if (((CheckBox)this.checkBox_PlannedMaintenance).CheckState == CheckState.Checked)
+            {
+                comboSourceReason.Add(0, "Other (Planned)");
+                comboSourceReason.Add(2, "Hardware: Maintenance (Planned)");
+                comboSourceReason.Add(4, "Hardware: Installation (Planned)");
+                comboSourceReason.Add(6, "Operating System: Reconfiguration (Planned)");
+                comboSourceReason.Add(8, "Application: Maintenance (Planned)");
+                comboSourceReason.Add(10, "Application: Installation (Planned)");
+            }
+            else
+            {
+                comboSourceReason.Add(1, "Other (Unplanned)");
+                comboSourceReason.Add(3, "Hardware: Maintenance (Unplanned)");
+                comboSourceReason.Add(5, "Hardware: Installation (Unplanned)");
+                comboSourceReason.Add(7, "Operating System: Reconfiguration (Unplanned)");
+                comboSourceReason.Add(9, "Application: Maintenance (Unplanned)");
+                comboSourceReason.Add(11, "Application: Unresponsive");
+                comboSourceReason.Add(12, "Application:  Unstable");
+                comboSourceReason.Add(13, "Security Issue");
+
+                // Disabled because it is not possible to use this tool without network connectivity
+                // comboSourceReason.Add(14, "Loss of network connectivity (Unplanned)");
+            }
+
+            this.cbx_Reason.DataSource = new BindingSource(comboSourceReason, null);
+            this.cbx_Reason.DisplayMember = "Value";
+            this.cbx_Reason.ValueMember = "Key";
+            this.cbx_Reason.SelectedIndex = 0;
         }
 
         public void UpdateMaintenanceStatus(int Status, string strMaintenanceUntil)
