@@ -61,7 +61,11 @@ namespace SCOMagentMaintenanceTool
 
         private void btn_Restart_Click(object sender, EventArgs e)
         {
-            System.Windows.Forms.MessageBox.Show("Not implemented yet");
+            var confirmRestart = System.Windows.Forms.MessageBox.Show("Are you sure that you want restart this server?", "Confirm restart", MessageBoxButtons.YesNo);
+            if (confirmRestart == DialogResult.Yes)
+            {
+                System.Windows.Forms.MessageBox.Show("Not implemented yet");
+            }
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -218,8 +222,11 @@ EXEC p_MaintenanceModeStart
             if (Settings.DebugMode == true)
                 this.txt_DEBUG.Text = "Executing SQL query:" + strSQLquery;
 
-
-            bool returnCode = ExecuteSQLquery(strSQLquery, Settings.SCOMdbConnectionString);
+            bool returnCode;
+            if (Settings.DebugMode == false)
+                returnCode = ExecuteSQLquery(strSQLquery, Settings.SCOMdbConnectionString);
+            else
+                returnCode = true;
 
             if (returnCode == true) {
                 this.lbl_SCOMconnectInfo.Text = "Maintenance mode enabled";
@@ -256,8 +263,11 @@ EXEC p_MaintenanceModeUpdate
             if (Settings.DebugMode == true)
                 this.txt_DEBUG.Text = "Executing SQL query:" + strSQLquery;
 
-
-            bool returnCode = ExecuteSQLquery(strSQLquery, Settings.SCOMdbConnectionString);
+            bool returnCode;
+            if (Settings.DebugMode == false)
+                returnCode = ExecuteSQLquery(strSQLquery, Settings.SCOMdbConnectionString);
+            else
+                returnCode = true;
 
             if (returnCode == true)
             {
@@ -290,8 +300,11 @@ EXEC p_MaintenanceModeStop
             if (Settings.DebugMode == true)
                 this.txt_DEBUG.Text = "Executing SQL query:" + strSQLquery;
 
-
-            bool returnCode = ExecuteSQLquery(strSQLquery, Settings.SCOMdbConnectionString);
+            bool returnCode;
+            if (Settings.DebugMode == false)
+                returnCode = ExecuteSQLquery(strSQLquery, Settings.SCOMdbConnectionString);
+            else
+                returnCode = true;
 
             if (returnCode == true)
             {
