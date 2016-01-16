@@ -188,11 +188,13 @@ namespace SCOMagentMaintenanceTool
                 this.lbl_restart_info.Text = "";
                 this.label_until.Text = "until:";
                 this.btn_Disable.Enabled = true;
+                this.checkBox_PlannedMaintenance.Enabled = false;
 
                 // Modify "Enable" button to "Update" button
                 this.btn_Enable.Text = "Update";
                 this.cbx_Reason.Enabled = false;
                 this.txt_Comment.Enabled = false;
+
                 this.btn_Enable.Click -= new System.EventHandler(this.btn_Enable_Click);
                 this.btn_Enable.Click += new System.EventHandler(this.btn_Update_Click);
 
@@ -213,6 +215,7 @@ namespace SCOMagentMaintenanceTool
                 this.label_until.Text = "";
                 this.label_until_value.Text = "";
                 this.btn_Disable.Enabled = false;
+                this.checkBox_PlannedMaintenance.Enabled = true;
 
                 // Modify "Update" button to "Enable" button
                 this.btn_Enable.Text = "Enable";
@@ -230,6 +233,7 @@ namespace SCOMagentMaintenanceTool
             this.lbl_SCOMconnectInfo.Text = "Connecting to SCOM database, please wait...";
             DateTime currentTime = DateTime.Now;
             string strMaintenanceUntil = currentTime.AddMinutes(DurationMin).ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
+            int intReasonCode = ((KeyValuePair<int, string>)this.cbx_Reason.SelectedItem).Key;
 
             string strSQLquery = @"
 DECLARE @BaseManagedTypeID VARCHAR(50)
@@ -244,7 +248,7 @@ SELECT @dt_end = DATEADD(Hour, DATEDIFF(Hour, GETDATE(), GETUTCDATE()), CAST('" 
 EXEC p_MaintenanceModeStart
 @BaseManagedEntityID = @BaseManagedEntityId,
 @ScheduledEndTime = @dt_end ,
-@ReasonCode = " + this.cbx_Reason.SelectedIndex + @",
+@ReasonCode = " + intReasonCode + @",
 @Comments = N'" + this.txt_Comment.Text + @"',
 @User = N'" + userName + @"',
 @Recursive = 1,
@@ -272,6 +276,7 @@ EXEC p_MaintenanceModeStart
             this.lbl_SCOMconnectInfo.Text = "Connecting to SCOM database, please wait...";
             DateTime currentTime = DateTime.Now;
             string strMaintenanceUntil = currentTime.AddMinutes(DurationMin).ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
+            int intReasonCode = ((KeyValuePair<int, string>)this.cbx_Reason.SelectedItem).Key;
 
             string strSQLquery = @"
 DECLARE @BaseManagedTypeID VARCHAR(50)
@@ -286,7 +291,7 @@ SELECT @dt_end = DATEADD(Hour, DATEDIFF(Hour, GETDATE(), GETUTCDATE()), CAST('" 
 EXEC p_MaintenanceModeUpdate
 @BaseManagedEntityID = @BaseManagedEntityId,
 @ScheduledEndTime = @dt_end ,
-@ReasonCode = " + this.cbx_Reason.SelectedIndex + @",
+@ReasonCode = " + intReasonCode + @",
 @Comments = N'" + this.txt_Comment.Text + @"',
 @User = N'" + userName + @"',
 @Recursive = 1
@@ -402,11 +407,11 @@ EXEC p_MaintenanceModeStop
 
         public void RestartServer()
         {
-            int reasonCode = this.cbx_Reason.SelectedIndex;
+            int intReasonCode = ((KeyValuePair<int, string>)this.cbx_Reason.SelectedItem).Key;
 
             // Converting SCOM reason code to shutdown.exe format
             string strShutdownReason;
-            switch (reasonCode)
+            switch (intReasonCode)
             {
                 case 0:
                     strShutdownReason = "p:0:0";

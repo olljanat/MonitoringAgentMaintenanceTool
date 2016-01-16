@@ -32,6 +32,7 @@
             this.label1 = new System.Windows.Forms.Label();
             this.label_MaintenanceStatus = new System.Windows.Forms.Label();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.checkBox_PlannedMaintenance = new System.Windows.Forms.CheckBox();
             this.lbl_SCOMconnectInfo = new System.Windows.Forms.Label();
             this.txt_Comment = new System.Windows.Forms.TextBox();
             this.btn_Disable = new System.Windows.Forms.Button();
@@ -47,7 +48,6 @@
             this.label_until_value = new System.Windows.Forms.Label();
             this.groupBox_DEBUG = new System.Windows.Forms.GroupBox();
             this.txt_DEBUG = new System.Windows.Forms.TextBox();
-            this.checkBox_PlannedMaintenance = new System.Windows.Forms.CheckBox();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox_DEBUG.SuspendLayout();
@@ -100,6 +100,19 @@
             this.groupBox1.TabIndex = 4;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Maintenance mode";
+            // 
+            // checkBox_PlannedMaintenance
+            // 
+            this.checkBox_PlannedMaintenance.AutoSize = true;
+            this.checkBox_PlannedMaintenance.Checked = true;
+            this.checkBox_PlannedMaintenance.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.checkBox_PlannedMaintenance.Location = new System.Drawing.Point(7, 72);
+            this.checkBox_PlannedMaintenance.Name = "checkBox_PlannedMaintenance";
+            this.checkBox_PlannedMaintenance.Size = new System.Drawing.Size(129, 17);
+            this.checkBox_PlannedMaintenance.TabIndex = 10;
+            this.checkBox_PlannedMaintenance.Text = "Planned maintenance";
+            this.checkBox_PlannedMaintenance.UseVisualStyleBackColor = true;
+            this.checkBox_PlannedMaintenance.CheckedChanged += new System.EventHandler(this.checkBox_PlannedMaintenance_CheckedChanged);
             // 
             // lbl_SCOMconnectInfo
             // 
@@ -242,19 +255,6 @@
             this.txt_DEBUG.Size = new System.Drawing.Size(993, 330);
             this.txt_DEBUG.TabIndex = 0;
             this.txt_DEBUG.Text = "DEBUG";
-            // 
-            // checkBox_PlannedMaintenance
-            // 
-            this.checkBox_PlannedMaintenance.AutoSize = true;
-            this.checkBox_PlannedMaintenance.Checked = true;
-            this.checkBox_PlannedMaintenance.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.checkBox_PlannedMaintenance.Location = new System.Drawing.Point(7, 72);
-            this.checkBox_PlannedMaintenance.Name = "checkBox_PlannedMaintenance";
-            this.checkBox_PlannedMaintenance.Size = new System.Drawing.Size(129, 17);
-            this.checkBox_PlannedMaintenance.TabIndex = 10;
-            this.checkBox_PlannedMaintenance.Text = "Planned maintenance";
-            this.checkBox_PlannedMaintenance.UseVisualStyleBackColor = true;
-            this.checkBox_PlannedMaintenance.CheckedChanged += new System.EventHandler(this.checkBox_PlannedMaintenance_CheckedChanged);
             // 
             // Form1
             // 
