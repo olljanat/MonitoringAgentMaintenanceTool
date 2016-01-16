@@ -2,10 +2,11 @@
 using System.Configuration;
 using System.Collections.Generic;
 using System.Data.SqlClient;
+using System.Drawing;
 using System.Globalization;
 using System.Net;
 using System.Net.NetworkInformation;
-using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
 namespace SCOMagentMaintenanceTool
@@ -31,6 +32,15 @@ namespace SCOMagentMaintenanceTool
         public Form1()
         {
             InitializeComponent();
+            this.StartPosition = FormStartPosition.Manual;
+            foreach (var scrn in Screen.AllScreens)
+            {
+                if (scrn.Bounds.Contains(this.Location))
+                {
+                    this.Location = new Point(scrn.Bounds.Right - this.Width, scrn.Bounds.Top);
+                    return;
+                }
+            }
         }
 
         private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
@@ -88,8 +98,6 @@ namespace SCOMagentMaintenanceTool
             TempConfigMap.ExeConfigFilename = TempConfigFile;
             TempConfig = ConfigurationManager.OpenMappedExeConfiguration(TempConfigMap, ConfigurationUserLevel.None);
 
-            // this.Left = Screen.PrimaryScreen.Bounds.Width - this.Width;
-            // this.Top = Screen.PrimaryScreen.Bounds.Height - this.Height;
             lbl_SCOMconnectInfo.Text = "";
 
             // DEBUG mode
@@ -505,5 +513,19 @@ EXEC p_MaintenanceModeStop
             if (DemoMode == false)
                 System.Diagnostics.Process.Start("C:\\Windows\\System32\\shutdown.exe", strCmdText);
         }
+
+        // Disable close button
+        /*
+        private const int CP_NOCLOSE_BUTTON = 0x200;
+        protected override CreateParams CreateParams
+        {
+            get
+            {
+                CreateParams myCp = base.CreateParams;
+                myCp.ClassStyle = myCp.ClassStyle | CP_NOCLOSE_BUTTON;
+                return myCp;
+            }
+        }
+        */
     }
 }
