@@ -64,7 +64,7 @@ namespace SCOMagentMaintenanceTool
             var confirmRestart = System.Windows.Forms.MessageBox.Show("Are you sure that you want restart this server?", "Confirm restart", MessageBoxButtons.YesNo);
             if (confirmRestart == DialogResult.Yes)
             {
-                System.Windows.Forms.MessageBox.Show("Not implemented yet");
+                RestartServer();
             }
         }
 
@@ -80,7 +80,7 @@ namespace SCOMagentMaintenanceTool
             }
             else
             {
-                this.ClientSize = new System.Drawing.Size(289, 406);
+                this.ClientSize = new System.Drawing.Size(288, 430);
                 this.groupBox_DEBUG.Visible = false;
             }
 
@@ -118,7 +118,9 @@ namespace SCOMagentMaintenanceTool
             this.cbx_Reason.Items.Add("Application: Unresponsive"); // 11
             this.cbx_Reason.Items.Add("Application: Unstable"); // 12
             this.cbx_Reason.Items.Add("Security Issue"); // 13
-            this.cbx_Reason.Items.Add("Loss of network connectivity (Unplanned)"); // 14
+
+            // Disabled because it is not possible to use this tool without network connectivity
+            // this.cbx_Reason.Items.Add("Loss of network connectivity (Unplanned)"); // 14
             this.cbx_Reason.SelectedIndex = 0;
 
             lbl_SCOMconnectInfo.Text = "";
@@ -379,9 +381,67 @@ EXEC p_MaintenanceModeStop
 
         public void RestartServer()
         {
+            int reasonCode = this.cbx_Reason.SelectedIndex;
+
+            // Converting SCOM reason code to shutdown.exe format
+            string strShutdownReason;
+            switch (reasonCode)
+            {
+                case 0:
+                    strShutdownReason = "p:0:0";
+                    break;
+                case 2:
+                    strShutdownReason = "p:1:1";
+                    break;
+                case 3:
+                    strShutdownReason = "u:1:1";
+                    break;
+                case 4:
+                    strShutdownReason = "p:1:2";
+                    break;
+                case 5:
+                    strShutdownReason = "u:1:2";
+                    break;
+                case 6:
+                    strShutdownReason = "p:2:4";
+                    break;
+                case 7:
+                    strShutdownReason = "u:2:4";
+                    break;
+                case 8:
+                    strShutdownReason = "p:4:1";
+                    break;
+                case 9:
+                    strShutdownReason = "u:4:1";
+                    break;
+                case 10:
+                    strShutdownReason = "p:4:2";
+                    break;
+                case 11:
+                    strShutdownReason = "u:4:5";
+                    break;
+                case 12:
+                    strShutdownReason = "u:4:6";
+                    break;
+                case 13:
+                    strShutdownReason = "u:5:19";
+                    break;
+                case 14:
+                    strShutdownReason = "u:5:20";
+                    break;
+                default:
+                    strShutdownReason = "u:0:0";
+                    break;
+            }
+
             string strCmdText;
-            strCmdText = "/r /t 0 /c " + this.txt_Comment + " /d ";
-            System.Diagnostics.Process.Start("C:\\Windows\\System32\\shutdown.exe", strCmdText);
+            strCmdText = "/r /t 0 /c \"" + this.txt_Comment.Text + "\" /d "+ strShutdownReason;
+
+            if (Settings.DebugMode == true)
+                this.txt_DEBUG.Text = strCmdText;
+
+            if (Settings.DemoMode == false)
+                System.Diagnostics.Process.Start("C:\\Windows\\System32\\shutdown.exe", strCmdText);
         }
     }
 }
