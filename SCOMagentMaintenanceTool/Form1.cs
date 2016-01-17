@@ -14,6 +14,9 @@ namespace SCOMagentMaintenanceTool
     public partial class Form1 : Form
     {
         // General strings/settings
+        public int intFormWidth;
+        public int intFormWidthDebugMode = 1024;
+        public int intFormWidthNormalMode = 288;
         public string strRestartInfoText = "Restart button will be activated after you enable maintenance mode";
         public string strMaintenanceStatusValue = "MaintenanceStatus";
         public string strMaintenanceUntilValue = "MaintenanceUntil";
@@ -31,15 +34,39 @@ namespace SCOMagentMaintenanceTool
 
         public Form1()
         {
+
+            if (ConfigurationManager.AppSettings["DebugMode"] == "true")
+                intFormWidth = intFormWidthDebugMode;
+            else
+                intFormWidth = intFormWidthNormalMode;
             InitializeComponent();
-            this.StartPosition = FormStartPosition.Manual;
-            foreach (var scrn in Screen.AllScreens)
+            if (ConfigurationManager.AppSettings["LocationTopRight"] == "true")
             {
-                if (scrn.Bounds.Contains(this.Location))
+                this.StartPosition = FormStartPosition.Manual;
+
+                foreach (var scrn in Screen.AllScreens)
                 {
-                    this.Location = new Point(scrn.Bounds.Right - this.Width, scrn.Bounds.Top);
-                    return;
+                    if (scrn.Bounds.Contains(this.Location))
+                    {
+                        this.Location = new Point(scrn.Bounds.Right - intFormWidth, scrn.Bounds.Top);
+                        return;
+                    }
                 }
+            }
+        }
+
+        // Disable close button
+        private const int CP_NOCLOSE_BUTTON = 0x200;
+        protected override CreateParams CreateParams
+        {
+            get
+            {
+                CreateParams myCp = base.CreateParams;
+                if (ConfigurationManager.AppSettings["DisableCloseButton"] == "true")
+                    myCp.ClassStyle = myCp.ClassStyle | CP_NOCLOSE_BUTTON;
+                else
+                    myCp.ClassStyle = myCp.ClassStyle;
+                return myCp;
             }
         }
 
@@ -513,19 +540,5 @@ EXEC p_MaintenanceModeStop
             if (DemoMode == false)
                 System.Diagnostics.Process.Start("C:\\Windows\\System32\\shutdown.exe", strCmdText);
         }
-
-        // Disable close button
-        /*
-        private const int CP_NOCLOSE_BUTTON = 0x200;
-        protected override CreateParams CreateParams
-        {
-            get
-            {
-                CreateParams myCp = base.CreateParams;
-                myCp.ClassStyle = myCp.ClassStyle | CP_NOCLOSE_BUTTON;
-                return myCp;
-            }
-        }
-        */
     }
 }
