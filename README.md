@@ -18,6 +18,7 @@ You can use this these commands to create "SCOMagentMaintenanceToolUser" role to
 * GRANT EXECUTE ON p_MaintenanceModeStart TO SCOMagentMaintenanceToolUser
 * GRANT EXECUTE ON p_MaintenanceModeStop TO SCOMagentMaintenanceToolUser
 * GRANT EXECUTE ON p_MaintenanceModeUpdate TO SCOMagentMaintenanceToolUser
+
 You also need give db_reader role for users.
 
 ## Screenshots
