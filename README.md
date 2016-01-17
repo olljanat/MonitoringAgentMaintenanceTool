@@ -7,9 +7,10 @@ This project also contains SQL reporting server report "SCOM_ServersOnMaintenanc
 
 
 ## Configuring / build
-* Configure SCOM database connection string to "SCOMdbConnectionString" variable on SCOMagentMaintenanceTool.exe.config
 * Build using Visual Studio 2015 (Express for Windows Desktop is enough)
-* Disable DebugMode after you are tested that application works on your environment and deploy it to all servers.
+* Configure SCOM database connection string to "SCOMdbConnectionString" variable on SCOMagentMaintenanceTool.exe.config
+* Disable DebugMode after you are tested that application works on your environment.
+* Deploy it to all servers using Install.ps1
 
 ## SCOM database delegations
 You can use this these commands to create "SCOMagentMaintenanceToolUser" role to SCOM database and after that you just need give that role for group where all server admins are:
@@ -17,6 +18,7 @@ You can use this these commands to create "SCOMagentMaintenanceToolUser" role to
 * GRANT EXECUTE ON p_MaintenanceModeStart TO SCOMagentMaintenanceToolUser
 * GRANT EXECUTE ON p_MaintenanceModeStop TO SCOMagentMaintenanceToolUser
 * GRANT EXECUTE ON p_MaintenanceModeUpdate TO SCOMagentMaintenanceToolUser
+You also need give db_reader role for users.
 
 ## Screenshots
 ### Debug mode
