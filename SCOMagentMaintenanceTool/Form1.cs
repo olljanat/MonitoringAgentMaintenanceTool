@@ -39,6 +39,9 @@ namespace SCOMagentMaintenanceTool
                 intFormWidth = intFormWidthDebugMode;
             else
                 intFormWidth = intFormWidthNormalMode;
+
+            if (ConfigurationManager.AppSettings["HideFromTaskbar"] == "true")
+                this.ShowInTaskbar = false;
             InitializeComponent();
             if (ConfigurationManager.AppSettings["LocationTopRight"] == "true")
             {
@@ -53,6 +56,7 @@ namespace SCOMagentMaintenanceTool
                     }
                 }
             }
+
         }
 
         // Disable close button
@@ -121,6 +125,9 @@ namespace SCOMagentMaintenanceTool
             DebugMode = Convert.ToBoolean(ConfigurationManager.AppSettings["DebugMode"]);
             DemoMode = Convert.ToBoolean(ConfigurationManager.AppSettings["DemoMode"]);
 
+            if (Convert.ToBoolean(ConfigurationManager.AppSettings["ShowMinizeButton"]))
+                this.MinimizeBox = true;
+
             // Load temporary settings
             TempConfigMap.ExeConfigFilename = TempConfigFile;
             TempConfig = ConfigurationManager.OpenMappedExeConfiguration(TempConfigMap, ConfigurationUserLevel.None);
@@ -159,6 +166,22 @@ namespace SCOMagentMaintenanceTool
 
             // Update maintenance status
             GetMaintenanceStatus();
+        }
+
+        private void Form1_Resize(object sender, System.EventArgs e)
+        {
+            if (FormWindowState.Minimized == WindowState)
+                Hide();
+        }
+        
+        private void notifyIcon_MouseClick(object sender, MouseEventArgs e)
+        {
+            Show();
+            WindowState = FormWindowState.Normal;
+            TopMost = true;
+            Focus();
+            BringToFront();
+            TopMost = false;
         }
 
         public void updateReasonCombobox()

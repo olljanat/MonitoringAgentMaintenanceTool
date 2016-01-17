@@ -1,7 +1,8 @@
 Param(
-	[Parameter(Mandatory=$False)][string]$InstallDirectory = "C:\Program Files\SCOMagentMaintenanceTool",
 	[Parameter(Mandatory=$False)][switch]$EnableAutoStart,
-	[Parameter(Mandatory=$False)][switch]$DisableWindowsPowerButton
+	[Parameter(Mandatory=$False)][switch]$DisableWindowsPowerButton,
+	[Parameter(Mandatory=$False)][switch]$AlwaysShowSystray,	
+	[Parameter(Mandatory=$False)][string]$InstallDirectory = "C:\Program Files\SCOMagentMaintenanceTool"
 )
 If (-NOT ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]"Administrator"))
 {
@@ -33,4 +34,9 @@ If ($EnableAutoStart) {
 # Disable Windows power button so users must use this tool for reboot (NOTE! shutdown.exe still works)
 If ($DisableWindowsPowerButton) {
 	New-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\policies\Explorer" -Name "NoClose" -Value 1 -Force
+}
+
+# Show systray always
+If ($AlwaysShowSystray) {
+New-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer" -Name "EnableAutoTray" -Value 0 -Force
 }
