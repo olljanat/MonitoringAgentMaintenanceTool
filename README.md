@@ -6,8 +6,8 @@ Tool uses SCOM databases stored procedures (p_MaintenanceModeStart/p_Maintenance
 This project also contains SQL reporting server report "SCOM_ServersOnMaintenanceMode.rdl" which can be used to report which servers are on maintenance mode.
 
 ## Releases
-|| Version | Date | File | MD5 hash ||
-| ------- | ---------- | ---------------------------------- | --------------------------------- |
+| Version | Date       | File                               | MD5 hash                         |
+|---------|------------|------------------------------------|----------------------------------|
 | 1.0.0.0 | 2016-01-18 | SCOMagentMaintenanceTool_v1000.zip | 279a8a73ea75d7c6418bdca8114df947 |
 
 ## Installation
