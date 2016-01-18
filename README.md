@@ -8,7 +8,7 @@ This project also contains SQL reporting server report "SCOM_ServersOnMaintenanc
 ## Releases
 | Version | Date       | File                               | MD5 hash                         |
 |---------|------------|------------------------------------|----------------------------------|
-| 1.0.0.0 | 2016-01-18 | SCOMagentMaintenanceTool_v1000.zip | 279a8a73ea75d7c6418bdca8114df947 |
+| 1.0.0.0 | 2016-01-18 | SCOMagentMaintenanceTool_v1000.zip | 4cb4dd2146cab6463ede5023a2776d8f |
 
 ## Installation
 You can find binary version from Releases folder.
@@ -25,14 +25,18 @@ You can use this these commands to create "SCOMagentMaintenanceToolUser" role to
 * GRANT EXECUTE ON p_MaintenanceModeStop TO SCOMagentMaintenanceToolUser
 * GRANT EXECUTE ON p_MaintenanceModeUpdate TO SCOMagentMaintenanceToolUser
 
-You also need give db_reader role for users.
+You also need give db_datareader role for users.
 
 ## Build
 * Build using Visual Studio 2015 (Express for Windows Desktop is enough)
 
+##
+* Application will not notice if another user is changed maintenance status.
+* Application will not change maintenance status when end time occurs.
+
 ## TODO
-* Nothing
-** All ideas are welcome.
+* Fixing known issues.
+* All ideas are welcome.
 
 ## Screenshots
 ### Debug mode
