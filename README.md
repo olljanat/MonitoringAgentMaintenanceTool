@@ -30,12 +30,12 @@ You also need give db_datareader role for users.
 ## Build
 * Build using Visual Studio 2015 (Express for Windows Desktop is enough)
 
-##
+## Known issues
 * Application will not notice if another user is changed maintenance status.
 * Application will not change maintenance status when end time occurs.
 
 ## TODO
-* Fixing known issues.
+* Fix known issues.
 * All ideas are welcome.
 
 ## Screenshots
