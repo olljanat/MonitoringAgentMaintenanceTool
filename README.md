@@ -33,6 +33,7 @@ You also need give db_datareader role for users.
 ## Known issues
 * Application will not notice if another user is changed maintenance status.
 * Application will not change maintenance status when end time occurs.
+* If client and SQL server are on different timezones you need compensate it when you choose length of maintenance mode.
 
 ## TODO
 * Fix known issues.
