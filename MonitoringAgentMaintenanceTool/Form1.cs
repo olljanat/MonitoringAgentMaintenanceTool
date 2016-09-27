@@ -6,8 +6,9 @@ using System.Drawing;
 using System.Globalization;
 using System.Net;
 using System.Net.NetworkInformation;
-using System.Runtime.InteropServices;
 using System.Windows.Forms;
+using System.IO;
+using System.ServiceProcess;
 
 namespace MonitoringAgentMaintenanceTool
 {
@@ -31,6 +32,9 @@ namespace MonitoringAgentMaintenanceTool
         public string TempConfigFile = System.Environment.GetEnvironmentVariable("public") + "\\MonitoringAgentMaintenanceTool.config";
         public ExeConfigurationFileMap TempConfigMap = new ExeConfigurationFileMap();
         public Configuration TempConfig;
+        public bool SCOMsupportEnabled;
+        public bool NimsoftSupportEnabled;
+        public string NimsoftRobotCFGfile = "C:\\Program Files\\Nimsoft\\robot\\robot.cfg";
 
         public Form1()
         {
@@ -121,7 +125,26 @@ namespace MonitoringAgentMaintenanceTool
         private void Form1_Load(object sender, EventArgs e)
         {
             // Read settings
-            SCOMdbConnectionString = ConfigurationManager.AppSettings["SCOMdbConnectionString"];
+            if (ConfigurationManager.AppSettings["EnableSCOMsupport"] == "true")
+            {
+                SCOMdbConnectionString = ConfigurationManager.AppSettings["SCOMdbConnectionString"];
+                SCOMsupportEnabled = true;
+            } else
+            {
+                SCOMdbConnectionString = "";
+                SCOMsupportEnabled = false;
+                if (!(System.IO.File.Exists(NimsoftRobotCFGfile)))
+                {
+                    System.Windows.Forms.MessageBox.Show("Nimsoft robot configuration file: " + NimsoftRobotCFGfile + " is missing");
+                    System.Environment.Exit(1);
+                }
+            }
+
+            if (ConfigurationManager.AppSettings["EnableNimsoftSupport"] == "true")
+                NimsoftSupportEnabled = true;
+            else
+                NimsoftSupportEnabled = false;
+
             DebugMode = Convert.ToBoolean(ConfigurationManager.AppSettings["DebugMode"]);
             DemoMode = Convert.ToBoolean(ConfigurationManager.AppSettings["DemoMode"]);
 
@@ -324,12 +347,16 @@ namespace MonitoringAgentMaintenanceTool
 
         public void EnableMaintenanceMode(int DurationMin)
         {
-            this.lbl_SCOMconnectInfo.Text = "Connecting to SCOM database, please wait...";
+            bool returnCode = false;
             DateTime currentTime = DateTime.Now;
+            string MaintenanceUntilEpochTime = ((DateTime.UtcNow.AddMinutes(DurationMin) - new DateTime(1970, 1, 1)).TotalSeconds).ToString("F0");
             string strMaintenanceUntil = currentTime.AddMinutes(DurationMin).ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
-            int intReasonCode = ((KeyValuePair<int, string>)this.cbx_Reason.SelectedItem).Key;
+            if (SCOMsupportEnabled == true)
+            {
+                lbl_SCOMconnectInfo.Text = "Connecting to SCOM database, please wait...";
+                int intReasonCode = ((KeyValuePair<int, string>)this.cbx_Reason.SelectedItem).Key;
 
-            string strSQLquery = @"
+                string strSQLquery = @"
 DECLARE @BaseManagedTypeID VARCHAR(50)
 DECLARE @BaseManagedEntityId VARCHAR(50)
 SELECT @BaseManagedTypeID = [BaseManagedTypeID] FROM [dbo].[ManagedType] WHERE [TypeName] = 'Microsoft.Windows.Server.Computer'
@@ -347,32 +374,65 @@ EXEC p_MaintenanceModeStart
 @User = N'" + userName + @"',
 @Recursive = 1,
 @StartTime = @dt_start
+    ";
 
-";
+                if (DebugMode == true)
+                    this.txt_DEBUG.Text = "Executing SQL query:" + strSQLquery;
 
-            if (DebugMode == true)
-                this.txt_DEBUG.Text = "Executing SQL query:" + strSQLquery;
+                if (DemoMode == false)
+                    returnCode = ExecuteSQLquery(strSQLquery, SCOMdbConnectionString);
+                else
+                    returnCode = true;
+            }
 
-            bool returnCode;
-            if (DemoMode == false)
-                returnCode = ExecuteSQLquery(strSQLquery, SCOMdbConnectionString);
-            else
-                returnCode = true;
+            if (NimsoftSupportEnabled == true)
+            {
+                lbl_SCOMconnectInfo.Text = "Restarting Nimsoft service, please wait...";
+
+                List<string> txtLines = new List<string>();
+                foreach (string str in File.ReadAllLines(NimsoftRobotCFGfile))
+                {
+                    // Skip these values if exist to be sure that we do not add duplicate values
+                    if (!str.Contains("maint_until") & !str.Contains("maint_from") & !str.Contains("</controller>"))
+                        txtLines.Add(str);
+                }
+                txtLines.Add("   maint_from = 0");
+                txtLines.Add("   maint_until = " + MaintenanceUntilEpochTime);
+                txtLines.Add("</controller>");
+
+                string[] NimsoftRobotCFG = txtLines.ToArray();
+
+
+                if (DebugMode == true)
+                    this.txt_DEBUG.Text = String.Join("\r\n", txtLines.ToArray());
+
+                if (DemoMode == false) {
+                    File.WriteAllLines(NimsoftRobotCFGfile, NimsoftRobotCFG);
+                    RestartNimsoftService();
+                    returnCode = true;
+                } else {
+                    returnCode = true;
+                }
+            }
 
             if (returnCode == true) {
-                this.lbl_SCOMconnectInfo.Text = "Maintenance mode enabled";
+                lbl_SCOMconnectInfo.Text = "Maintenance mode enabled";
                 UpdateMaintenanceStatus(1, strMaintenanceUntil);
             }
         }
 
         public void UpdateMaintenanceMode(int DurationMin)
         {
-            this.lbl_SCOMconnectInfo.Text = "Connecting to SCOM database, please wait...";
+            bool returnCode = false;
             DateTime currentTime = DateTime.Now;
+            string MaintenanceUntilEpochTime = ((DateTime.UtcNow.AddMinutes(DurationMin) - new DateTime(1970, 1, 1)).TotalSeconds).ToString("F0");
             string strMaintenanceUntil = currentTime.AddMinutes(DurationMin).ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
-            int intReasonCode = ((KeyValuePair<int, string>)this.cbx_Reason.SelectedItem).Key;
+            if (SCOMsupportEnabled == true)
+            {
+                lbl_SCOMconnectInfo.Text = "Connecting to SCOM database, please wait...";
+                int intReasonCode = ((KeyValuePair<int, string>)this.cbx_Reason.SelectedItem).Key;
 
-            string strSQLquery = @"
+                string strSQLquery = @"
 DECLARE @BaseManagedTypeID VARCHAR(50)
 DECLARE @BaseManagedEntityId VARCHAR(50)
 SELECT @BaseManagedTypeID = [BaseManagedTypeID] FROM [dbo].[ManagedType] WHERE [TypeName] = 'Microsoft.Windows.Server.Computer'
@@ -389,30 +449,63 @@ EXEC p_MaintenanceModeUpdate
 @Comments = N'" + this.txt_Comment.Text + @"',
 @User = N'" + userName + @"',
 @Recursive = 1
-
 ";
 
-            if (DebugMode == true)
-                this.txt_DEBUG.Text = "Executing SQL query:" + strSQLquery;
+                if (DebugMode == true)
+                    this.txt_DEBUG.Text = "Executing SQL query:" + strSQLquery;
 
-            bool returnCode;
-            if (DemoMode == false)
-                returnCode = ExecuteSQLquery(strSQLquery, SCOMdbConnectionString);
-            else
-                returnCode = true;
+                if (DemoMode == false)
+                    returnCode = ExecuteSQLquery(strSQLquery, SCOMdbConnectionString);
+                else
+                    returnCode = true;
+            }
+
+            if (NimsoftSupportEnabled == true)
+            {
+                lbl_SCOMconnectInfo.Text = "Restarting Nimsoft service, please wait...";
+                List<string> txtLines = new List<string>();
+                foreach (string str in File.ReadAllLines(NimsoftRobotCFGfile))
+                {
+                    // Skip these values if exist to be sure that we do not add duplicate values
+                    if (!str.Contains("maint_until") & !str.Contains("maint_from") & !str.Contains("</controller>"))
+                        txtLines.Add(str);
+                }
+                txtLines.Add("   maint_from = 0");
+                txtLines.Add("   maint_until = " + MaintenanceUntilEpochTime);
+                txtLines.Add("</controller>");
+
+                string[] NimsoftRobotCFG = txtLines.ToArray();
+
+
+                if (DebugMode == true)
+                    this.txt_DEBUG.Text = String.Join("\r\n", txtLines.ToArray());
+
+                if (DemoMode == false)
+                {
+                    File.WriteAllLines(NimsoftRobotCFGfile, NimsoftRobotCFG);
+                    RestartNimsoftService();
+                    returnCode = true;
+                }
+                else {
+                    returnCode = true;
+                }
+            }
 
             if (returnCode == true)
             {
-                this.lbl_SCOMconnectInfo.Text = "Maintenance mode updated";
+                lbl_SCOMconnectInfo.Text = "Maintenance mode updated";
                 UpdateMaintenanceStatus(1, strMaintenanceUntil);
             }
         }
 
         public void DisableMaintenanceMode()
         {
-            this.lbl_SCOMconnectInfo.Text = "Connecting to SCOM database, please wait...";
+            bool returnCode = false;
+            if (SCOMsupportEnabled == true)
+            {
+                lbl_SCOMconnectInfo.Text = "Connecting to SCOM database, please wait...";
 
-            string strSQLquery = @"
+                string strSQLquery = @"
 DECLARE @BaseManagedTypeID VARCHAR(50)
 DECLARE @BaseManagedEntityId VARCHAR(50)
 SELECT @BaseManagedTypeID = [BaseManagedTypeID] FROM [dbo].[ManagedType] WHERE [TypeName] = 'Microsoft.Windows.Server.Computer'
@@ -429,14 +522,44 @@ EXEC p_MaintenanceModeStop
 
 ";
 
-            if (DebugMode == true)
-                this.txt_DEBUG.Text = "Executing SQL query:" + strSQLquery;
+                if (DebugMode == true)
+                    this.txt_DEBUG.Text = "Executing SQL query:" + strSQLquery;
 
-            bool returnCode;
-            if (DemoMode == false)
-                returnCode = ExecuteSQLquery(strSQLquery, SCOMdbConnectionString);
-            else
-                returnCode = true;
+                if (DemoMode == false)
+                    returnCode = ExecuteSQLquery(strSQLquery, SCOMdbConnectionString);
+                else
+                    returnCode = true;
+
+            }
+
+            if (NimsoftSupportEnabled == true)
+            {
+                lbl_SCOMconnectInfo.Text = "Restarting Nimsoft service, please wait...";
+                List<string> txtLines = new List<string>();
+                foreach (string str in File.ReadAllLines(NimsoftRobotCFGfile))
+                {
+                    // Skip these values if exist
+                    if (!str.Contains("maint_until") & !str.Contains("maint_from") & !str.Contains("</controller>"))
+                        txtLines.Add(str);
+                }
+                txtLines.Add("</controller>");
+
+                string[] NimsoftRobotCFG = txtLines.ToArray();
+
+
+                if (DebugMode == true)
+                    this.txt_DEBUG.Text = String.Join("\r\n", txtLines.ToArray());
+
+                if (DemoMode == false)
+                {
+                    File.WriteAllLines(NimsoftRobotCFGfile, NimsoftRobotCFG);
+                    RestartNimsoftService();
+                    returnCode = true;
+                }
+                else {
+                    returnCode = true;
+                }
+            }
 
             if (returnCode == true)
             {
@@ -563,5 +686,31 @@ EXEC p_MaintenanceModeStop
             if (DemoMode == false)
                 System.Diagnostics.Process.Start("C:\\Windows\\System32\\shutdown.exe", strCmdText);
         }
+
+        public void RestartNimsoftService()
+        {
+            ServiceController service = new ServiceController("Nimsoft Robot Watcher");
+            try
+            {
+                int millisec1 = Environment.TickCount;
+                TimeSpan timeout = TimeSpan.FromMilliseconds(20000);
+
+                service.Stop();
+                service.WaitForStatus(ServiceControllerStatus.Stopped, timeout);
+
+                // count the rest of the timeout
+                int millisec2 = Environment.TickCount;
+                timeout = TimeSpan.FromMilliseconds(20000 - (millisec2 - millisec1));
+
+                service.Start();
+                service.WaitForStatus(ServiceControllerStatus.Running, timeout);
+            }
+            catch (Exception e)
+            {
+                lbl_SCOMconnectInfo.Text = "ERROR: " + e.Message;
+                lbl_SCOMconnectInfo.ForeColor = System.Drawing.Color.Red;
+            }
+        }
+
     }
 }
