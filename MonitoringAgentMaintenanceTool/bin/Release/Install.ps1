@@ -2,7 +2,7 @@ Param(
 	[Parameter(Mandatory=$False)][switch]$EnableAutoStart,
 	[Parameter(Mandatory=$False)][switch]$DisableWindowsPowerButton,
 	[Parameter(Mandatory=$False)][switch]$AlwaysShowSystray,	
-	[Parameter(Mandatory=$False)][string]$InstallDirectory = "C:\Program Files\SCOMagentMaintenanceTool"
+	[Parameter(Mandatory=$False)][string]$InstallDirectory = "C:\Program Files\MonitoringAgentMaintenanceTool"
 )
 If (-NOT ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]"Administrator"))
 {
@@ -17,14 +17,14 @@ If (-NOT (Test-Path ($InstallDirectory))) {
 }
 
 # Install/update
-Copy-Item -Path "$scriptPath\SCOMagentMaintenanceTool.exe" -Destination $InstallDirectory -Force
-Copy-Item -Path "$scriptPath\SCOMagentMaintenanceTool.exe.config" -Destination $InstallDirectory -Force
-Copy-Item -Path "$scriptPath\SCOMagentMaintenanceTool.config" -Destination $env:PUBLIC -Force
+Copy-Item -Path "$scriptPath\MonitoringAgentMaintenanceTool.exe" -Destination $InstallDirectory -Force
+Copy-Item -Path "$scriptPath\MonitoringAgentMaintenanceTool.exe.config" -Destination $InstallDirectory -Force
+Copy-Item -Path "$scriptPath\MonitoringAgentMaintenanceTool.config" -Destination $env:PUBLIC -Force
 
 ## Auto start on login
 If ($EnableAutoStart) {
-	$TargetFile = $InstallDirectory + "\SCOMagentMaintenanceTool.exe"
-	$ShortcutFile = $env:ALLUSERSPROFILE + "\Microsoft\Windows\Start Menu\Programs\StartUp\SCOMagentMaintenanceTool.lnk"
+	$TargetFile = $InstallDirectory + "\MonitoringAgentMaintenanceTool.exe"
+	$ShortcutFile = $env:ALLUSERSPROFILE + "\Microsoft\Windows\Start Menu\Programs\StartUp\MonitoringAgentMaintenanceTool.lnk"
 	$WScriptShell = New-Object -ComObject WScript.Shell
 	$Shortcut = $WScriptShell.CreateShortcut($ShortcutFile)
 	$Shortcut.TargetPath = $TargetFile

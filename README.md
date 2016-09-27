@@ -8,22 +8,22 @@ This project also contains SQL reporting server report "SCOM_ServersOnMaintenanc
 ## Releases
 | Version | Date       | File                               | MD5 hash                         |
 |---------|------------|------------------------------------|----------------------------------|
-| 1.0.0.0 | 2016-01-18 | SCOMagentMaintenanceTool_v1000.zip | 4cb4dd2146cab6463ede5023a2776d8f |
+| 1.0.0.0 | 2016-01-18 | MonitoringAgentMaintenanceTool_v1000.zip | 4cb4dd2146cab6463ede5023a2776d8f |
 
 ## Installation
 You can find binary version from Releases folder.
 Do installation using "Run as administrator.cmd" to single computer and using Install.ps1 for mass deployments.
 
 ## Configuring
-* Configure SCOM database connection string to "SCOMdbConnectionString" variable on SCOMagentMaintenanceTool.exe.config
+* Configure SCOM database connection string to "SCOMdbConnectionString" variable on MonitoringAgentMaintenanceTool.exe.config
 * Disable DebugMode after you are tested that application works on your environment
 
 ## SCOM database delegations
-You can use this these commands to create "SCOMagentMaintenanceToolUser" role to SCOM database and after that you just need give that role for group where all server admins are:
-* CREATE ROLE SCOMagentMaintenanceToolUser
-* GRANT EXECUTE ON p_MaintenanceModeStart TO SCOMagentMaintenanceToolUser
-* GRANT EXECUTE ON p_MaintenanceModeStop TO SCOMagentMaintenanceToolUser
-* GRANT EXECUTE ON p_MaintenanceModeUpdate TO SCOMagentMaintenanceToolUser
+You can use this these commands to create "MonitoringAgentMaintenanceToolUser" role to SCOM database and after that you just need give that role for group where all server admins are:
+* CREATE ROLE MonitoringAgentMaintenanceToolUser
+* GRANT EXECUTE ON p_MaintenanceModeStart TO MonitoringAgentMaintenanceToolUser
+* GRANT EXECUTE ON p_MaintenanceModeStop TO MonitoringAgentMaintenanceToolUser
+* GRANT EXECUTE ON p_MaintenanceModeUpdate TO MonitoringAgentMaintenanceToolUser
 
 You also need give db_datareader role for users.
 
@@ -41,11 +41,11 @@ You also need give db_datareader role for users.
 
 ## Screenshots
 ### Debug mode
-![Alt text](https://raw.githubusercontent.com/olljanat/SCOMagentMaintenanceTool/master/Screenshots/DebugMode.PNG "Debug mode")
+![Alt text](https://raw.githubusercontent.com/olljanat/MonitoringAgentMaintenanceTool/master/Screenshots/DebugMode.PNG "Debug mode")
 ### Normal mode
-![Alt text](https://raw.githubusercontent.com/olljanat/SCOMagentMaintenanceTool/master/Screenshots/NormalMode_after_start.PNG "Normal mode after start")
-![Alt text](https://raw.githubusercontent.com/olljanat/SCOMagentMaintenanceTool/master/Screenshots/NormalMode_maintenance_enabled.PNG "Normal mode maintenance enabled")
-![Alt text](https://raw.githubusercontent.com/olljanat/SCOMagentMaintenanceTool/master/Screenshots/NormalMode_maintenance_updated.PNG "Normal mode maintenance updated")
-![Alt text](https://raw.githubusercontent.com/olljanat/SCOMagentMaintenanceTool/master/Screenshots/NormalMode_maintenance_disabled.PNG "Normal mode maintenance disabled")
+![Alt text](https://raw.githubusercontent.com/olljanat/MonitoringAgentMaintenanceTool/master/Screenshots/NormalMode_after_start.PNG "Normal mode after start")
+![Alt text](https://raw.githubusercontent.com/olljanat/MonitoringAgentMaintenanceTool/master/Screenshots/NormalMode_maintenance_enabled.PNG "Normal mode maintenance enabled")
+![Alt text](https://raw.githubusercontent.com/olljanat/MonitoringAgentMaintenanceTool/master/Screenshots/NormalMode_maintenance_updated.PNG "Normal mode maintenance updated")
+![Alt text](https://raw.githubusercontent.com/olljanat/MonitoringAgentMaintenanceTool/master/Screenshots/NormalMode_maintenance_disabled.PNG "Normal mode maintenance disabled")
 ### SQL report
-![Alt text](https://raw.githubusercontent.com/olljanat/SCOMagentMaintenanceTool/master/Screenshots/SQLreport.PNG "SQL report")
+![Alt text](https://raw.githubusercontent.com/olljanat/MonitoringAgentMaintenanceTool/master/Screenshots/SQLreport.PNG "SQL report")

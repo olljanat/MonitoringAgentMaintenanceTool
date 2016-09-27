@@ -1,6 +1,6 @@
 Param(
 	[Parameter(Mandatory=$False)][switch]$EnableWindowsPowerButton,
-	[Parameter(Mandatory=$False)][string]$InstallDirectory = "C:\Program Files\SCOMagentMaintenanceTool"
+	[Parameter(Mandatory=$False)][string]$InstallDirectory = "C:\Program Files\MonitoringAgentMaintenanceTool"
 )
 If (-NOT ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]"Administrator"))
 {
@@ -9,8 +9,8 @@ If (-NOT ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdenti
 }
 
 Get-ChildItem $InstallDirectory | Remove-Item -Confirm:$False
-Get-ChildItem "$env:PUBLIC\SCOMagentMaintenanceTool.config" | Remove-Item -Confirm:$False
-Get-ChildItem "$env:ALLUSERSPROFILE\Microsoft\Windows\Start Menu\Programs\StartUp\SCOMagentMaintenanceTool.lnk" | Remove-Item -Confirm:$False
+Get-ChildItem "$env:PUBLIC\MonitoringAgentMaintenanceTool.config" | Remove-Item -Confirm:$False
+Get-ChildItem "$env:ALLUSERSPROFILE\Microsoft\Windows\Start Menu\Programs\StartUp\MonitoringAgentMaintenanceTool.lnk" | Remove-Item -Confirm:$False
 
 # Enable Windows power button (use only if was disabled on installation)
 If ($EnableWindowsPowerButton) {

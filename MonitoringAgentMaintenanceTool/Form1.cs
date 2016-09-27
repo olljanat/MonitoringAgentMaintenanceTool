@@ -9,7 +9,7 @@ using System.Net.NetworkInformation;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
-namespace SCOMagentMaintenanceTool
+namespace MonitoringAgentMaintenanceTool
 {
     public partial class Form1 : Form
     {
@@ -28,7 +28,7 @@ namespace SCOMagentMaintenanceTool
         public string SCOMdbConnectionString;
         public bool DebugMode = false;
         public bool DemoMode = false;
-        public string TempConfigFile = System.Environment.GetEnvironmentVariable("public") + "\\SCOMagentMaintenanceTool.config";
+        public string TempConfigFile = System.Environment.GetEnvironmentVariable("public") + "\\MonitoringAgentMaintenanceTool.config";
         public ExeConfigurationFileMap TempConfigMap = new ExeConfigurationFileMap();
         public Configuration TempConfig;
 

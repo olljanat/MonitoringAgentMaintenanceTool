@@ -1,4 +1,4 @@
-﻿namespace SCOMagentMaintenanceTool
+﻿namespace MonitoringAgentMaintenanceTool
 {
     partial class Form1
     {
@@ -279,11 +279,10 @@
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox_DEBUG);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
-            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "Form1";
-            this.Text = "SCOM Agent Maintenance Tool";
+            this.Text = "Monitoring Agent Maintenance Tool";
             this.Load += new System.EventHandler(this.Form1_Load);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
