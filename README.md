@@ -28,7 +28,7 @@ You can use this these commands to create "SCOMagentMaintenanceToolUser" role to
 You also need give db_datareader role for users.
 
 ## Build
-* Build using Visual Studio 2015 (Express for Windows Desktop is enough)
+* Run `build.cmd`
 
 ## Known issues
 * Application will not notice if another user is changed maintenance status.
