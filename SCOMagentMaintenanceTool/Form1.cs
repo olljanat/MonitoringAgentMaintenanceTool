@@ -329,29 +329,26 @@ namespace SCOMagentMaintenanceTool
             string strMaintenanceUntil = currentTime.AddMinutes(DurationMin).ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
             int intReasonCode = ((KeyValuePair<int, string>)this.cbx_Reason.SelectedItem).Key;
 
-            string strSQLquery = @"
-DECLARE @BaseManagedTypeID VARCHAR(50)
-DECLARE @BaseManagedEntityId VARCHAR(50)
-SELECT @BaseManagedTypeID = [BaseManagedTypeID] FROM [dbo].[ManagedType] WHERE [TypeName] = 'Microsoft.Windows.Server.Computer'
-SELECT @BaseManagedEntityId = [BaseManagedEntityId] FROM [dbo].[BaseManagedEntity] WHERE [Name] = '" + GetFQDN() + @"' AND [BaseManagedTypeID] = @BaseManagedTypeID
-
-DECLARE @dt_start DateTime, @dt_end DateTime
-SET @dt_start = GETUTCDATE()
-SELECT @dt_end = DATEADD(Hour, DATEDIFF(Hour, GETDATE(), GETUTCDATE()), CAST('" + strMaintenanceUntil + @"' AS datetime))
-
-EXEC p_MaintenanceModeStart
-@BaseManagedEntityID = @BaseManagedEntityId,
-@ScheduledEndTime = @dt_end ,
-@ReasonCode = " + intReasonCode + @",
-@Comments = N'" + this.txt_Comment.Text + @"',
-@User = N'" + userName + @"',
-@Recursive = 1,
-@StartTime = @dt_start
-
-";
+            string strSQLquery = "DECLARE @BaseManagedTypeID VARCHAR(50)" + Environment.NewLine;
+            strSQLquery += "DECLARE @BaseManagedEntityId VARCHAR(50)" + Environment.NewLine;
+            strSQLquery += "SELECT @BaseManagedTypeID = [BaseManagedTypeID] FROM [dbo].[ManagedType] WHERE [TypeName] = 'Microsoft.Windows.Server.Computer'" + Environment.NewLine;
+            strSQLquery += "SELECT @BaseManagedEntityId = [BaseManagedEntityId] FROM [dbo].[BaseManagedEntity] WHERE [Name] = '" + GetFQDN() + @"' AND [BaseManagedTypeID] = @BaseManagedTypeID" + Environment.NewLine;
+            strSQLquery += Environment.NewLine;
+            strSQLquery += "DECLARE @dt_start DateTime, @dt_end DateTime" + Environment.NewLine;
+            strSQLquery += "SET @dt_start = GETUTCDATE()" + Environment.NewLine;
+            strSQLquery += "SELECT @dt_end = DATEADD(Hour, DATEDIFF(Hour, GETDATE(), GETUTCDATE()), CAST('" + strMaintenanceUntil + @"' AS datetime))" + Environment.NewLine;
+            strSQLquery += Environment.NewLine;
+            strSQLquery += "EXEC p_MaintenanceModeStart" + Environment.NewLine;
+            strSQLquery += "@BaseManagedEntityID = @BaseManagedEntityId," + Environment.NewLine;
+            strSQLquery += "@ScheduledEndTime = @dt_end ," + Environment.NewLine;
+            strSQLquery += "@ReasonCode = " + intReasonCode + @"," + Environment.NewLine;
+            strSQLquery += "@Comments = N'" + this.txt_Comment.Text + @"'," + Environment.NewLine;
+            strSQLquery += "@User = N'" + userName + @"'," + Environment.NewLine;
+            strSQLquery += "@Recursive = 1," + Environment.NewLine;
+            strSQLquery += "@StartTime = @dt_start" + Environment.NewLine;
 
             if (DebugMode == true)
-                this.txt_DEBUG.Text = "Executing SQL query:" + strSQLquery;
+                this.txt_DEBUG.Text = "Executing SQL query:" + Environment.NewLine + strSQLquery;
 
             bool returnCode;
             if (DemoMode == false)
@@ -372,25 +369,22 @@ EXEC p_MaintenanceModeStart
             string strMaintenanceUntil = currentTime.AddMinutes(DurationMin).ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
             int intReasonCode = ((KeyValuePair<int, string>)this.cbx_Reason.SelectedItem).Key;
 
-            string strSQLquery = @"
-DECLARE @BaseManagedTypeID VARCHAR(50)
-DECLARE @BaseManagedEntityId VARCHAR(50)
-SELECT @BaseManagedTypeID = [BaseManagedTypeID] FROM [dbo].[ManagedType] WHERE [TypeName] = 'Microsoft.Windows.Server.Computer'
-SELECT @BaseManagedEntityId = [BaseManagedEntityId] FROM [dbo].[BaseManagedEntity] WHERE [Name] = '" + GetFQDN() + @"' AND [BaseManagedTypeID] = @BaseManagedTypeID
-
-DECLARE @dt_start DateTime, @dt_end DateTime
-SET @dt_start = GETUTCDATE()
-SELECT @dt_end = DATEADD(Hour, DATEDIFF(Hour, GETDATE(), GETUTCDATE()), CAST('" + strMaintenanceUntil + @"' AS datetime))
-
-EXEC p_MaintenanceModeUpdate
-@BaseManagedEntityID = @BaseManagedEntityId,
-@ScheduledEndTime = @dt_end ,
-@ReasonCode = " + intReasonCode + @",
-@Comments = N'" + this.txt_Comment.Text + @"',
-@User = N'" + userName + @"',
-@Recursive = 1
-
-";
+            string strSQLquery = "DECLARE @BaseManagedTypeID VARCHAR(50)" + Environment.NewLine;
+            strSQLquery += "DECLARE @BaseManagedEntityId VARCHAR(50)" + Environment.NewLine;
+            strSQLquery += "SELECT @BaseManagedTypeID = [BaseManagedTypeID] FROM [dbo].[ManagedType] WHERE [TypeName] = 'Microsoft.Windows.Server.Computer'" + Environment.NewLine;
+            strSQLquery += "SELECT @BaseManagedEntityId = [BaseManagedEntityId] FROM [dbo].[BaseManagedEntity] WHERE [Name] = '" + GetFQDN() + @"' AND [BaseManagedTypeID] = @BaseManagedTypeID" + Environment.NewLine;
+            strSQLquery += Environment.NewLine;
+            strSQLquery += "DECLARE @dt_start DateTime, @dt_end DateTime" + Environment.NewLine;
+            strSQLquery += "SET @dt_start = GETUTCDATE()" + Environment.NewLine;
+            strSQLquery += "SELECT @dt_end = DATEADD(Hour, DATEDIFF(Hour, GETDATE(), GETUTCDATE()), CAST('" + strMaintenanceUntil + @"' AS datetime))" + Environment.NewLine;
+            strSQLquery += Environment.NewLine;
+            strSQLquery += "EXEC p_MaintenanceModeUpdate" + Environment.NewLine;
+            strSQLquery += "@BaseManagedEntityID = @BaseManagedEntityId," + Environment.NewLine;
+            strSQLquery += "@ScheduledEndTime = @dt_end ," + Environment.NewLine;
+            strSQLquery += "@ReasonCode = " + intReasonCode + @"," + Environment.NewLine;
+            strSQLquery += "@Comments = N'" + this.txt_Comment.Text + @"'," + Environment.NewLine;
+            strSQLquery += "@User = N'" + userName + @"'," + Environment.NewLine;
+            strSQLquery += "@Recursive = 1" + Environment.NewLine;
 
             if (DebugMode == true)
                 this.txt_DEBUG.Text = "Executing SQL query:" + strSQLquery;
@@ -412,22 +406,19 @@ EXEC p_MaintenanceModeUpdate
         {
             this.lbl_SCOMconnectInfo.Text = "Connecting to SCOM database, please wait...";
 
-            string strSQLquery = @"
-DECLARE @BaseManagedTypeID VARCHAR(50)
-DECLARE @BaseManagedEntityId VARCHAR(50)
-SELECT @BaseManagedTypeID = [BaseManagedTypeID] FROM [dbo].[ManagedType] WHERE [TypeName] = 'Microsoft.Windows.Server.Computer'
-SELECT @BaseManagedEntityId = [BaseManagedEntityId] FROM [dbo].[BaseManagedEntity] WHERE [Name] = '" + GetFQDN() + @"' AND [BaseManagedTypeID] = @BaseManagedTypeID
-
-DECLARE @dt_end DateTime
-SET @dt_end = GETUTCDATE()
-
-EXEC p_MaintenanceModeStop
-@BaseManagedEntityID = @BaseManagedEntityId,
-@User = N'" + userName + @"',
-@Recursive = 1,
-@EndTime = @dt_end
-
-";
+            string strSQLquery = "DECLARE @BaseManagedTypeID VARCHAR(50)" + Environment.NewLine;
+            strSQLquery += "DECLARE @BaseManagedEntityId VARCHAR(50)" + Environment.NewLine;
+            strSQLquery += "SELECT @BaseManagedTypeID = [BaseManagedTypeID] FROM [dbo].[ManagedType] WHERE [TypeName] = 'Microsoft.Windows.Server.Computer'" + Environment.NewLine;
+            strSQLquery += "SELECT @BaseManagedEntityId = [BaseManagedEntityId] FROM [dbo].[BaseManagedEntity] WHERE [Name] = '" + GetFQDN() + @"' AND [BaseManagedTypeID] = @BaseManagedTypeID" + Environment.NewLine;
+            strSQLquery += Environment.NewLine;
+            strSQLquery += "DECLARE @dt_end DateTime" + Environment.NewLine;
+            strSQLquery += "SET @dt_end = GETUTCDATE()" + Environment.NewLine;
+            strSQLquery += Environment.NewLine;
+            strSQLquery += "EXEC p_MaintenanceModeStop" + Environment.NewLine;
+            strSQLquery += "@BaseManagedEntityID = @BaseManagedEntityId," + Environment.NewLine;
+            strSQLquery += "@User = N'" + userName + @"'," + Environment.NewLine;
+            strSQLquery += "@Recursive = 1," + Environment.NewLine;
+            strSQLquery += "@EndTime = @dt_end" + Environment.NewLine;
 
             if (DebugMode == true)
                 this.txt_DEBUG.Text = "Executing SQL query:" + strSQLquery;
