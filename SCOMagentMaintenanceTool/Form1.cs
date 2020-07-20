@@ -233,10 +233,10 @@ namespace SCOMagentMaintenanceTool
             string strMaintenanceComment = TempConfig.AppSettings.Settings["MaintenananceComment"].Value;
             string strMaintenanceEnabledBy = TempConfig.AppSettings.Settings["MaintenanceEnabledBy"].Value;
 
-            DateTime currentTime = DateTime.Now;
-            DateTime MaintenanceUntil = currentTime;
+            DateTime currentTime = DateTime.UtcNow;
+            DateTime MaintenanceUntil = DateTime.SpecifyKind(currentTime, DateTimeKind.Utc);
             if (strMaintenanceUntil != "")
-                MaintenanceUntil = DateTime.Parse(strMaintenanceUntil);
+                MaintenanceUntil = DateTime.SpecifyKind(DateTime.Parse(strMaintenanceUntil), DateTimeKind.Utc);
 
             // If maintenance mode is already ended
             if ((boolMaintenanceStatus == true) && (strMaintenanceUntil != "") && (currentTime >= MaintenanceUntil))
@@ -257,7 +257,7 @@ namespace SCOMagentMaintenanceTool
                 this.label_until.Text = "until:";
                 this.btn_Disable.Enabled = true;
                 this.checkBox_PlannedMaintenance.Enabled = false;
-                this.label_until_value.Text = strMaintenanceUntil;
+                this.label_until_value.Text = MaintenanceUntil.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
                 if (intPlannedMaintenanceSelection == 1)
                     this.checkBox_PlannedMaintenance.CheckState = CheckState.Checked;
                 else
@@ -325,7 +325,7 @@ namespace SCOMagentMaintenanceTool
         public void EnableMaintenanceMode(int DurationMin)
         {
             this.lbl_SCOMconnectInfo.Text = "Connecting to SCOM database, please wait...";
-            DateTime currentTime = DateTime.Now;
+            DateTime currentTime = DateTime.UtcNow;
             string strMaintenanceUntil = currentTime.AddMinutes(DurationMin).ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
             int intReasonCode = ((KeyValuePair<int, string>)this.cbx_Reason.SelectedItem).Key;
 
@@ -336,7 +336,7 @@ namespace SCOMagentMaintenanceTool
             strSQLquery += Environment.NewLine;
             strSQLquery += "DECLARE @dt_start DateTime, @dt_end DateTime" + Environment.NewLine;
             strSQLquery += "SET @dt_start = GETUTCDATE()" + Environment.NewLine;
-            strSQLquery += "SELECT @dt_end = DATEADD(Hour, DATEDIFF(Hour, GETDATE(), GETUTCDATE()), CAST('" + strMaintenanceUntil + @"' AS datetime))" + Environment.NewLine;
+            strSQLquery += "SELECT @dt_end = CAST('" + strMaintenanceUntil + @"' AS datetime)" + Environment.NewLine;
             strSQLquery += Environment.NewLine;
             strSQLquery += "EXEC p_MaintenanceModeStart" + Environment.NewLine;
             strSQLquery += "@BaseManagedEntityID = @BaseManagedEntityId," + Environment.NewLine;
@@ -365,7 +365,7 @@ namespace SCOMagentMaintenanceTool
         public void UpdateMaintenanceMode(int DurationMin)
         {
             this.lbl_SCOMconnectInfo.Text = "Connecting to SCOM database, please wait...";
-            DateTime currentTime = DateTime.Now;
+            DateTime currentTime = DateTime.UtcNow;
             string strMaintenanceUntil = currentTime.AddMinutes(DurationMin).ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
             int intReasonCode = ((KeyValuePair<int, string>)this.cbx_Reason.SelectedItem).Key;
 
@@ -376,7 +376,7 @@ namespace SCOMagentMaintenanceTool
             strSQLquery += Environment.NewLine;
             strSQLquery += "DECLARE @dt_start DateTime, @dt_end DateTime" + Environment.NewLine;
             strSQLquery += "SET @dt_start = GETUTCDATE()" + Environment.NewLine;
-            strSQLquery += "SELECT @dt_end = DATEADD(Hour, DATEDIFF(Hour, GETDATE(), GETUTCDATE()), CAST('" + strMaintenanceUntil + @"' AS datetime))" + Environment.NewLine;
+            strSQLquery += "SELECT @dt_end = CAST('" + strMaintenanceUntil + @"' AS datetime)" + Environment.NewLine;
             strSQLquery += Environment.NewLine;
             strSQLquery += "EXEC p_MaintenanceModeUpdate" + Environment.NewLine;
             strSQLquery += "@BaseManagedEntityID = @BaseManagedEntityId," + Environment.NewLine;
