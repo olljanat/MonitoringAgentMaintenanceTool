@@ -34,15 +34,16 @@
             this.label1 = new System.Windows.Forms.Label();
             this.label_MaintenanceStatus = new System.Windows.Forms.Label();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.checkBox_PlannedMaintenance = new System.Windows.Forms.CheckBox();
+            this.btn_DisableAndLogoff = new System.Windows.Forms.Button();
             this.lbl_SCOMconnectInfo = new System.Windows.Forms.Label();
             this.txt_Comment = new System.Windows.Forms.TextBox();
             this.btn_Disable = new System.Windows.Forms.Button();
             this.label4 = new System.Windows.Forms.Label();
-            this.cbx_Reason = new System.Windows.Forms.ComboBox();
-            this.label3 = new System.Windows.Forms.Label();
             this.cbx_Duration = new System.Windows.Forms.ComboBox();
             this.label2 = new System.Windows.Forms.Label();
+            this.checkBox_PlannedMaintenance = new System.Windows.Forms.CheckBox();
+            this.cbx_Reason = new System.Windows.Forms.ComboBox();
+            this.label3 = new System.Windows.Forms.Label();
             this.btn_Restart = new System.Windows.Forms.Button();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.lbl_restart_info = new System.Windows.Forms.Label();
@@ -58,7 +59,7 @@
             // 
             // btn_Enable
             // 
-            this.btn_Enable.Location = new System.Drawing.Point(9, 202);
+            this.btn_Enable.Location = new System.Drawing.Point(9, 177);
             this.btn_Enable.Name = "btn_Enable";
             this.btn_Enable.Size = new System.Drawing.Size(75, 23);
             this.btn_Enable.TabIndex = 0;
@@ -87,13 +88,11 @@
             // 
             // groupBox1
             // 
-            this.groupBox1.Controls.Add(this.checkBox_PlannedMaintenance);
+            this.groupBox1.Controls.Add(this.btn_DisableAndLogoff);
             this.groupBox1.Controls.Add(this.lbl_SCOMconnectInfo);
             this.groupBox1.Controls.Add(this.txt_Comment);
             this.groupBox1.Controls.Add(this.btn_Disable);
             this.groupBox1.Controls.Add(this.label4);
-            this.groupBox1.Controls.Add(this.cbx_Reason);
-            this.groupBox1.Controls.Add(this.label3);
             this.groupBox1.Controls.Add(this.btn_Enable);
             this.groupBox1.Controls.Add(this.cbx_Duration);
             this.groupBox1.Controls.Add(this.label2);
@@ -104,22 +103,19 @@
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Maintenance mode";
             // 
-            // checkBox_PlannedMaintenance
+            // btn_DisableAndLogoff
             // 
-            this.checkBox_PlannedMaintenance.AutoSize = true;
-            this.checkBox_PlannedMaintenance.Checked = true;
-            this.checkBox_PlannedMaintenance.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.checkBox_PlannedMaintenance.Location = new System.Drawing.Point(7, 72);
-            this.checkBox_PlannedMaintenance.Name = "checkBox_PlannedMaintenance";
-            this.checkBox_PlannedMaintenance.Size = new System.Drawing.Size(129, 17);
-            this.checkBox_PlannedMaintenance.TabIndex = 10;
-            this.checkBox_PlannedMaintenance.Text = "Planned maintenance";
-            this.checkBox_PlannedMaintenance.UseVisualStyleBackColor = true;
-            this.checkBox_PlannedMaintenance.CheckedChanged += new System.EventHandler(this.checkBox_PlannedMaintenance_CheckedChanged);
+            this.btn_DisableAndLogoff.Location = new System.Drawing.Point(33, 206);
+            this.btn_DisableAndLogoff.Name = "btn_DisableAndLogoff";
+            this.btn_DisableAndLogoff.Size = new System.Drawing.Size(107, 23);
+            this.btn_DisableAndLogoff.TabIndex = 11;
+            this.btn_DisableAndLogoff.Text = "Disable and logoff";
+            this.btn_DisableAndLogoff.UseVisualStyleBackColor = true;
+            this.btn_DisableAndLogoff.Click += new System.EventHandler(this.btn_DisableAndLogoff_Click);
             // 
             // lbl_SCOMconnectInfo
             // 
-            this.lbl_SCOMconnectInfo.Location = new System.Drawing.Point(6, 237);
+            this.lbl_SCOMconnectInfo.Location = new System.Drawing.Point(4, 120);
             this.lbl_SCOMconnectInfo.Name = "lbl_SCOMconnectInfo";
             this.lbl_SCOMconnectInfo.Size = new System.Drawing.Size(188, 54);
             this.lbl_SCOMconnectInfo.TabIndex = 9;
@@ -127,15 +123,15 @@
             // 
             // txt_Comment
             // 
-            this.txt_Comment.Location = new System.Drawing.Point(9, 162);
+            this.txt_Comment.Location = new System.Drawing.Point(9, 29);
+            this.txt_Comment.Multiline = true;
             this.txt_Comment.Name = "txt_Comment";
-            this.txt_Comment.Size = new System.Drawing.Size(100, 20);
+            this.txt_Comment.Size = new System.Drawing.Size(185, 48);
             this.txt_Comment.TabIndex = 7;
             // 
             // btn_Disable
             // 
-            this.btn_Disable.Enabled = false;
-            this.btn_Disable.Location = new System.Drawing.Point(108, 202);
+            this.btn_Disable.Location = new System.Drawing.Point(90, 177);
             this.btn_Disable.Name = "btn_Disable";
             this.btn_Disable.Size = new System.Drawing.Size(75, 23);
             this.btn_Disable.TabIndex = 6;
@@ -146,36 +142,17 @@
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(6, 145);
+            this.label4.Location = new System.Drawing.Point(6, 16);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(51, 13);
+            this.label4.Size = new System.Drawing.Size(116, 13);
             this.label4.TabIndex = 4;
-            this.label4.Text = "Comment";
-            // 
-            // cbx_Reason
-            // 
-            this.cbx_Reason.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cbx_Reason.FormattingEnabled = true;
-            this.cbx_Reason.Location = new System.Drawing.Point(9, 109);
-            this.cbx_Reason.Name = "cbx_Reason";
-            this.cbx_Reason.Size = new System.Drawing.Size(185, 21);
-            this.cbx_Reason.TabIndex = 3;
-            this.cbx_Reason.SelectedIndexChanged += new System.EventHandler(this.cbx_Reason_SelectedIndexChanged);
-            // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(6, 92);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(44, 13);
-            this.label3.TabIndex = 2;
-            this.label3.Text = "Reason";
+            this.label4.Text = "Purpose of maintenace";
             // 
             // cbx_Duration
             // 
             this.cbx_Duration.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbx_Duration.FormattingEnabled = true;
-            this.cbx_Duration.Location = new System.Drawing.Point(9, 41);
+            this.cbx_Duration.Location = new System.Drawing.Point(7, 96);
             this.cbx_Duration.Name = "cbx_Duration";
             this.cbx_Duration.Size = new System.Drawing.Size(121, 21);
             this.cbx_Duration.TabIndex = 1;
@@ -184,11 +161,43 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(6, 25);
+            this.label2.Location = new System.Drawing.Point(6, 80);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(47, 13);
             this.label2.TabIndex = 0;
             this.label2.Text = "Duration";
+            // 
+            // checkBox_PlannedMaintenance
+            // 
+            this.checkBox_PlannedMaintenance.AutoSize = true;
+            this.checkBox_PlannedMaintenance.Checked = true;
+            this.checkBox_PlannedMaintenance.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.checkBox_PlannedMaintenance.Location = new System.Drawing.Point(270, 71);
+            this.checkBox_PlannedMaintenance.Name = "checkBox_PlannedMaintenance";
+            this.checkBox_PlannedMaintenance.Size = new System.Drawing.Size(129, 17);
+            this.checkBox_PlannedMaintenance.TabIndex = 10;
+            this.checkBox_PlannedMaintenance.Text = "Planned maintenance";
+            this.checkBox_PlannedMaintenance.UseVisualStyleBackColor = true;
+            this.checkBox_PlannedMaintenance.CheckedChanged += new System.EventHandler(this.checkBox_PlannedMaintenance_CheckedChanged);
+            // 
+            // cbx_Reason
+            // 
+            this.cbx_Reason.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbx_Reason.FormattingEnabled = true;
+            this.cbx_Reason.Location = new System.Drawing.Point(270, 107);
+            this.cbx_Reason.Name = "cbx_Reason";
+            this.cbx_Reason.Size = new System.Drawing.Size(185, 21);
+            this.cbx_Reason.TabIndex = 3;
+            this.cbx_Reason.SelectedIndexChanged += new System.EventHandler(this.cbx_Reason_SelectedIndexChanged);
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(267, 91);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(44, 13);
+            this.label3.TabIndex = 2;
+            this.label3.Text = "Reason";
             // 
             // btn_Restart
             // 
@@ -271,10 +280,13 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1024, 768);
+            this.Controls.Add(this.checkBox_PlannedMaintenance);
             this.Controls.Add(this.label_until_value);
             this.Controls.Add(this.label_until);
             this.Controls.Add(this.groupBox1);
+            this.Controls.Add(this.cbx_Reason);
             this.Controls.Add(this.label_MaintenanceStatus);
+            this.Controls.Add(this.label3);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox_DEBUG);
@@ -318,6 +330,7 @@
         private System.Windows.Forms.TextBox txt_DEBUG;
         private System.Windows.Forms.CheckBox checkBox_PlannedMaintenance;
         private System.Windows.Forms.NotifyIcon notifyIcon;
+        private System.Windows.Forms.Button btn_DisableAndLogoff;
     }
 }
 
