@@ -172,7 +172,7 @@
             this.checkBox_PlannedMaintenance.AutoSize = true;
             this.checkBox_PlannedMaintenance.Checked = true;
             this.checkBox_PlannedMaintenance.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.checkBox_PlannedMaintenance.Location = new System.Drawing.Point(270, 71);
+            this.checkBox_PlannedMaintenance.Location = new System.Drawing.Point(430, 62);
             this.checkBox_PlannedMaintenance.Name = "checkBox_PlannedMaintenance";
             this.checkBox_PlannedMaintenance.Size = new System.Drawing.Size(129, 17);
             this.checkBox_PlannedMaintenance.TabIndex = 10;
@@ -184,7 +184,7 @@
             // 
             this.cbx_Reason.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbx_Reason.FormattingEnabled = true;
-            this.cbx_Reason.Location = new System.Drawing.Point(270, 107);
+            this.cbx_Reason.Location = new System.Drawing.Point(430, 98);
             this.cbx_Reason.Name = "cbx_Reason";
             this.cbx_Reason.Size = new System.Drawing.Size(185, 21);
             this.cbx_Reason.TabIndex = 3;
@@ -193,7 +193,7 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(267, 91);
+            this.label3.Location = new System.Drawing.Point(427, 82);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(44, 13);
             this.label3.TabIndex = 2;
