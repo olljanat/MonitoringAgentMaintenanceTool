@@ -8,6 +8,8 @@ If (-NOT ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdenti
     Break
 }
 
+Get-Process -Name "SCOMagentMaintenanceTool" -ErrorAction:SilentlyContinue | Stop-Process -Force
+
 Get-ChildItem $InstallDirectory | Remove-Item -Confirm:$False
 Get-ChildItem "$env:PUBLIC\SCOMagentMaintenanceTool.config" | Remove-Item -Confirm:$False
 Get-ChildItem "$env:ALLUSERSPROFILE\Microsoft\Windows\Start Menu\Programs\StartUp\SCOMagentMaintenanceTool.lnk" | Remove-Item -Confirm:$False

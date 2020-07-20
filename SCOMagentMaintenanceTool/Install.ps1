@@ -10,6 +10,8 @@ If (-NOT ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdenti
     Break
 }
 
+Get-Process -Name "SCOMagentMaintenanceTool" -ErrorAction:SilentlyContinue | Stop-Process -Force
+
 $scriptPath = Split-Path -parent $MyInvocation.MyCommand.Definition
 
 If (-NOT (Test-Path ($InstallDirectory))) {
