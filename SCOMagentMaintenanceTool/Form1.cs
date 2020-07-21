@@ -6,8 +6,9 @@ using System.Drawing;
 using System.Globalization;
 using System.Net;
 using System.Net.NetworkInformation;
-using System.Runtime.InteropServices;
+using System.Threading;
 using System.Windows.Forms;
+using System.IO;
 
 namespace SCOMagentMaintenanceTool
 {
@@ -28,12 +29,11 @@ namespace SCOMagentMaintenanceTool
         public string SCOMdbConnectionString;
         public bool DebugMode = false;
         public bool DemoMode = false;
-        public string TempConfigFile = System.Environment.GetEnvironmentVariable("public") + "\\SCOMagentMaintenanceTool.config";
+        public static string TempConfigFolder = System.Environment.GetEnvironmentVariable("public");
+        public static string TempConfigFile = TempConfigFolder + "\\SCOMagentMaintenanceTool.config";
         public ExeConfigurationFileMap TempConfigMap = new ExeConfigurationFileMap();
         public Configuration TempConfig;
-        public Timer AutoEnableTimer = new Timer();
-        // public Timer AutoUpdateTimer = new Timer();
-
+        public System.Windows.Forms.Timer RefreshTimer = new System.Windows.Forms.Timer();
         public Form1()
         {
 
@@ -105,21 +105,6 @@ namespace SCOMagentMaintenanceTool
         {
             DisableMaintenanceMode();
         }
-
-        private void btn_Cancel_Click(object sender, EventArgs e)
-        {
-            this.lbl_SCOMconnectInfo.Text = "Automatic enable cancelled.";
-            RestoreDisableButton();
-        }
-
-        public void RestoreDisableButton()
-        {
-            this.AutoEnableTimer.Stop();
-            this.btn_Disable.Text = "Disable";
-            this.btn_Disable.Click -= new System.EventHandler(this.btn_Cancel_Click);
-            this.btn_Disable.Click += new System.EventHandler(this.btn_Disable_Click);
-        }
-
         private void btn_Restart_Click(object sender, EventArgs e)
         {
             var confirmRestart = System.Windows.Forms.MessageBox.Show("Are you sure that you want restart this server?", "Confirm restart", MessageBoxButtons.YesNo);
@@ -133,31 +118,25 @@ namespace SCOMagentMaintenanceTool
         {
             updateReasonCombobox();
         }
-
-        private void AutoEnableTimer_Tick(object sender, EventArgs e)
+        private void RefreshTimer_Tick(object sender, EventArgs e)
         {
-            // Stop timer and enable maintenande mode
-            RestoreDisableButton();
-            EnableMaintenanceMode(((KeyValuePair<int, string>)this.cbx_Duration.SelectedItem).Key);
-
-            /*
-            // Start new timer for maintenace mode update
-            AutoUpdateTimer.Interval = (290 * 1000); // 5 minutes
-            AutoUpdateTimer.Tick += new EventHandler(AutoEnableTimer_Tick);
-            AutoUpdateTimer.Start();
-            */
+            ReloadTempConfigFile();
+            GetMaintenanceStatus(false);
         }
 
-        private void AutoUpdateTimer_Tick(object sender, EventArgs e)
+        private void ReloadTempConfigFile()
         {
-            // Stop timer and update maintenande mode
-            AutoEnableTimer.Stop();
-            UpdateMaintenanceMode(5);
-
-            // Update and restart timer
-            AutoEnableTimer.Interval = (290 * 1000); // 5 minutes
-            AutoEnableTimer.Tick += new EventHandler(AutoEnableTimer_Tick);
-            AutoEnableTimer.Start();
+            // Quick & Dirty way to make sure that we do no write and read file same time
+            // or crash if another user is doing same action on same time.
+            try
+            {
+                Thread.Sleep(1000);
+                TempConfig = null;
+                TempConfig = ConfigurationManager.OpenMappedExeConfiguration(TempConfigMap, ConfigurationUserLevel.None);
+                ConfigurationManager.RefreshSection("appSettings");
+                Properties.Settings.Default.Reload();
+            }
+            catch { }
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -208,6 +187,11 @@ namespace SCOMagentMaintenanceTool
 
             // Update maintenance status
             GetMaintenanceStatus(true);
+
+            // Refresh maintenance status every 15 seconds
+            RefreshTimer.Interval = (15 * 1000);
+            RefreshTimer.Tick += new EventHandler(RefreshTimer_Tick);
+            RefreshTimer.Start();
         }
 
         private void Form1_Resize(object sender, System.EventArgs e)
@@ -266,7 +250,6 @@ namespace SCOMagentMaintenanceTool
                 System.Windows.Forms.MessageBox.Show("Temporary configuration file: " + TempConfigFile + " missing");
                 System.Environment.Exit(1);
             }
-            AutoEnableTimer.Stop();
 
             bool boolMaintenanceStatus = Convert.ToBoolean(TempConfig.AppSettings.Settings["MaintenanceStatus"].Value);
             string strMaintenanceUntil = TempConfig.AppSettings.Settings["MaintenanceUntil"].Value;
@@ -285,13 +268,9 @@ namespace SCOMagentMaintenanceTool
             if ((boolMaintenanceStatus == true) && (strMaintenanceUntil != "") && (currentTime >= MaintenanceUntil))
             {
                 btn_DisableAndLogoff.Text = "Logoff";
-                TempConfig.AppSettings.Settings["MaintenanceStatus"].Value = "false";
-                TempConfig.AppSettings.Settings["MaintenanceUntil"].Value = "";
-                TempConfig.AppSettings.Settings["PlannedMaintenance"].Value = "0";
-                TempConfig.AppSettings.Settings["MaintenananceReason"].Value = "";
-                TempConfig.AppSettings.Settings["MaintenananceComment"].Value = "";
-                TempConfig.AppSettings.Settings["MaintenanceEnabledBy"].Value = "";
-                TempConfig.Save(ConfigurationSaveMode.Modified);
+                UpdateMaintenanceStatus(0, "");
+
+                if (FormLoad) { OnFormLoad(); }
             }
             else if (boolMaintenanceStatus == true)
             {
@@ -333,20 +312,14 @@ namespace SCOMagentMaintenanceTool
                 this.btn_Enable.Click -= new System.EventHandler(this.btn_Update_Click);
                 this.btn_Enable.Click += new System.EventHandler(this.btn_Enable_Click);
 
-                if (FormLoad)
-                {
-                    int autoEnableSeconds = 30;
-                    this.txt_Comment.Text = "Automatically enabled maintenance mode";
-                    AutoEnableTimer.Interval = (autoEnableSeconds * 1000); // 30 seconds
-                    AutoEnableTimer.Tick += new EventHandler(AutoEnableTimer_Tick);
-                    AutoEnableTimer.Start();
-
-                    this.lbl_SCOMconnectInfo.Text = "Maintenance mode will be automatically enabled on" + Environment.NewLine + DateTime.Now.AddSeconds(autoEnableSeconds).ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
-                    this.btn_Disable.Text = "Cancel";
-                    this.btn_Disable.Click -= new System.EventHandler(this.btn_Disable_Click);
-                    this.btn_Disable.Click += new System.EventHandler(this.btn_Cancel_Click);
-                }
+                if (FormLoad) { OnFormLoad(); }
             }
+        }
+
+        private void OnFormLoad()
+        {
+            this.txt_Comment.Text = "Automatically enabled maintenance mode";
+            EnableMaintenanceMode(((KeyValuePair<int, string>)this.cbx_Duration.SelectedItem).Key);
         }
 
         public void UpdateMaintenanceStatus(int Status, string strMaintenanceUntil)

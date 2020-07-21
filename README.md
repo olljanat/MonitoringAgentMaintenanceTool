@@ -5,13 +5,7 @@ Tool uses SCOM databases stored procedures (p_MaintenanceModeStart/p_Maintenance
 
 This project also contains SQL reporting server report "SCOM_ServersOnMaintenanceMode.rdl" which can be used to report which servers are on maintenance mode.
 
-## Releases
-| Version | Date       | File                               | MD5 hash                         |
-|---------|------------|------------------------------------|----------------------------------|
-| 1.0.0.0 | 2016-01-18 | SCOMagentMaintenanceTool_v1000.zip | 4cb4dd2146cab6463ede5023a2776d8f |
-
 ## Installation
-You can find binary version from Releases folder.
 Do installation using "Run as administrator.cmd" to single computer and using Install.ps1 for mass deployments.
 
 ## Configuring
@@ -29,14 +23,6 @@ You also need give db_datareader role for users.
 
 ## Build
 * Run `build.cmd`
-
-## Known issues
-* Application will not notice if another user is changed maintenance status.
-* Application will not change maintenance status when end time occurs.
-
-## TODO
-* Fix known issues.
-* All ideas are welcome.
 
 ## Screenshots
 ### Debug mode
