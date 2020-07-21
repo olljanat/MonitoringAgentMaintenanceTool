@@ -121,7 +121,7 @@ namespace SCOMagentMaintenanceTool
         private void RefreshTimer_Tick(object sender, EventArgs e)
         {
             ReloadTempConfigFile();
-            GetMaintenanceStatus(false);
+            GetMaintenanceStatus(false, true);
         }
 
         private void ReloadTempConfigFile()
@@ -186,7 +186,7 @@ namespace SCOMagentMaintenanceTool
             updateReasonCombobox();
 
             // Update maintenance status
-            GetMaintenanceStatus(true);
+            GetMaintenanceStatus(true, false);
 
             // Refresh maintenance status every 15 seconds
             RefreshTimer.Interval = (15 * 1000);
@@ -243,7 +243,7 @@ namespace SCOMagentMaintenanceTool
             this.cbx_Reason.SelectedIndex = 0;
         }
 
-        public void GetMaintenanceStatus(bool FormLoad)
+        public void GetMaintenanceStatus(bool FormLoad, bool refresh)
         {
             if (!(System.IO.File.Exists(TempConfigFile)))
             {
@@ -268,9 +268,27 @@ namespace SCOMagentMaintenanceTool
             if ((boolMaintenanceStatus == true) && (strMaintenanceUntil != "") && (currentTime >= MaintenanceUntil))
             {
                 btn_DisableAndLogoff.Text = "Logoff";
+                this.lbl_SCOMconnectInfo.Text = "Maintenance mode is ended.";
                 UpdateMaintenanceStatus(0, "");
 
                 if (FormLoad) { OnFormLoad(); }
+
+                if (refresh)
+                {
+                    RefreshTimer.Stop();
+                    DialogResult result = MessageBox.Show(
+                        "Maintenance mode is ended." + Environment.NewLine + "Do you want continue it?", "SCOM Agent Maintenace Tool",
+                        MessageBoxButtons.YesNo,
+                        MessageBoxIcon.Warning,
+                        MessageBoxDefaultButton.Button1,
+                        MessageBoxOptions.DefaultDesktopOnly
+                    );
+                    if (result == DialogResult.Yes)
+                        EnableMaintenanceMode(((KeyValuePair<int, string>)this.cbx_Duration.SelectedItem).Key);
+                    else
+                        this.txt_Comment.Text = "";
+                    RefreshTimer.Start();
+                }
             }
             else if (boolMaintenanceStatus == true)
             {
@@ -315,13 +333,11 @@ namespace SCOMagentMaintenanceTool
                 if (FormLoad) { OnFormLoad(); }
             }
         }
-
         private void OnFormLoad()
         {
             this.txt_Comment.Text = "Automatically enabled maintenance mode";
             EnableMaintenanceMode(((KeyValuePair<int, string>)this.cbx_Duration.SelectedItem).Key);
         }
-
         public void UpdateMaintenanceStatus(int Status, string strMaintenanceUntil)
         {
             if (Status == 1)
@@ -349,7 +365,7 @@ namespace SCOMagentMaintenanceTool
                 TempConfig.Save(ConfigurationSaveMode.Modified);
             }
 
-            GetMaintenanceStatus(false);
+            GetMaintenanceStatus(false, false);
         }
 
         public void EnableMaintenanceMode(int DurationMin)
